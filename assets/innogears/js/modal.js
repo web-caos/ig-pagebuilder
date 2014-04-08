@@ -33,7 +33,7 @@
 
         this.extendedOptions = ['scrollable', 'context', 'frameId', 'url'];
 
-        this.iframe    = this.options.jParent('<iframe/>', { 'scrolling': this.options.scrollable == false ? 'no' : 'yes', 'frameborder': '0' });
+        this.iframe    = this.options.jParent('<iframe/>', {'src' : 'about:blank', 'scrolling': this.options.scrollable == false ? 'no' : 'yes', 'frameborder': '0' });
         if (this.options.frameId != '') {
         	this.iframe.attr('id', this.options.frameId);
         }

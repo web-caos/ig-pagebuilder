@@ -1,6 +1,6 @@
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -318,8 +318,7 @@
 }
 /* === this css is in sample.css of Com_sample, it should be in jsn-general.css === */
 .add-field-dialog .btn {
-    display: block;
-    text-align: left !important;
+    display: block;    
     width: 100%;
 }
 .add-field-dialog {
@@ -385,9 +384,39 @@
     padding-top: 0;
 }
 /* === for sorting Element in Popover === */
-#ig-add-element .jsn-items-list li{
-    width: 32.5% !important;
+#ig-add-element .jsn-items-list {
+	position: relative;
 }
+
+#ig-add-element .jsn-items-list li{
+	width: 32.5% !important;
+}
+
+#ig-add-element .jsn-items-list li.full-width {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: auto !important;
+	height: auto !important;
+}
+#ig-add-element .jsn-items-list li.full-width > textarea {
+	width: 100%;
+	height: 15em;
+}
+#ig-add-element .jsn-items-list li.full-width > button {
+	width: auto;
+	outline: 0 !important;
+}
+
+#ig-add-element .jsn-items-list li.ig-loading {
+	background: url(../images/icons-24/icon-24-loading-circle.gif) 50% 50% no-repeat;
+}
+#ig-add-element .jsn-items-list li.ig-loading > * {
+	visibility: hidden;
+}
+
 /* === to prevent scrollbar when have some elements, but the scrollbar still shows === */
 #ig-add-element .jsn-items-list{
     max-height: 260px !important;
@@ -401,6 +430,10 @@
     position: relative !important;
 }
 
+#ig-add-element #rawshortcode-add {
+	width: 120px;
+	margin: 0 auto;
+}
 /* === WIDGET === */
 #ig-widget-form label{
     display: inline !important;
@@ -469,7 +502,7 @@ input:checked + .radio_image{
 .ig-widget-box .ig_widget_select_elm{
     max-width: 174px;
 }
-/* === Message when deactivate Pagebuilder === */
+/* === Message when deactivate IG PageBuilder === */
 #off-message{
     position: absolute;
     top: 0;
@@ -573,9 +606,22 @@ input:checked + .radio_image{
     width: 100% !important;
 }
 /* === Premade layout === */
-.premade-layout-item {
-    line-height: 24px;
+#save-as-new-dialog {
+	display: none;
 }
+#save-as-new-dialog .modal-header h3 {
+    color: #404040 !important;
+    font-weight: bold !important;
+    margin-bottom: 5px !important;
+    margin-top: 5px !important;
+    padding: 5px !important;
+    font-size: 18px !important;
+}
+#save-as-new-dialog {
+	width: 500px;
+	margin-left: -250px;
+}
+
 #ig-add-layout {
     position: relative;
     padding-bottom: 10px;
@@ -593,13 +639,35 @@ input:checked + .radio_image{
     color: #333;
 }
 #ig-add-layout a:hover, #ig-add-layout .layout-message{
-    color: #0099FF;
+    color: #f00;
     text-decoration: none;
 }
 #ig-add-layout #save-layout-form .btn {
     width: 30px;
     padding: 4px 2px;
 }
+
+#ig-layout-lib .premade-layout-item .delete-item{
+    float: right;
+    
+    cursor: pointer;
+    display: inline-block;
+    visibility: hidden;
+}
+
+#ig-layout-lib .premade-layout-item .jsn-icon-loading {
+    width: 15px;
+    height: 15px;
+    background-color: none;
+}
+
+#ig-layout-lib .premade-layout-item:hover .delete-item{
+    display: inline-block;
+    visibility: visible;
+}
+
+
+
 #ig-layout-lib {
     width: 100%;
 }
@@ -612,41 +680,7 @@ input:checked + .radio_image{
 #ig-layout-lib .jsn-fieldset-filter {
     padding: 2px 16px;
 }
-#ig-layout-lib .jsn-items-list .premade-layout-item {
-    width: 96%;
-    color: #000;
-    padding: 5px;
-    font-size: 14px;
-    text-align: center;
-    display: inline-block;
-    text-decoration: none;
-    border: 1px solid #CCC;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    transition: color 0.3s linear, background 0.3s ease-out;
-    -moz-transition: color 0.3s linear, background 0.3s ease-out;
-    -webkit-transition: color 0.3s linear, background 0.3s ease-out;
-}
-#ig-layout-lib .jsn-items-list .premade-layout-item:hover {
-    background-color: #EFEFEF;
-    box-shadow: 0 0 5px #999;
-    -moz-box-shadow: 0 0 5px #999;
-    -webkit-box-shadow: 0 0 5px #999;
-}
-#ig-layout-lib .jsn-items-list .premade-layout-item.selected-layout {
-    padding-left: 6px;
-    padding-right: 6px;
-    font-weight: bold;
-    background-color: #FFCC33;
-    box-shadow: 0 0 5px #999;
-    -moz-box-shadow: 0 0 5px #999;
-    -webkit-box-shadow: 0 0 5px #999;
-}
-#ig-layout-lib .jsn-items-list button.premade-layout-item:hover,
-#ig-layout-lib .jsn-items-list button.premade-layout-item.selected-layout {
-    background-color: #e6e6e6 !important;
-}
+
 #ig-layout-lib .jsn-items-list span.thumbnail {
     height: 150px;
     padding-top: 0;
@@ -664,5 +698,34 @@ input:checked + .radio_image{
 /* === Disable element === */
 .jsn-element.disabled {
     opacity: 0.8;
-    background: #CECECE !important;
+    color: #CCC !important;
+}
+
+.jsn-element.disabled:hover .jsn-iconbar a {
+    display: none;
+}
+
+.jsn-element.disabled:hover .jsn-iconbar a.element-deactivate {
+    display: block;
+}
+
+/*------   Custom css for "Add custom css" feature   ------*/
+#top-btn-actions div{
+    margin-left: 10px;
+}
+
+#ig-pb-custom-css-box .css-files-container {
+	height: 120px;
+}
+
+#ig-pb-custom-css-box .items-list-edit-content textarea {
+	height: 120px;
+}
+
+#ig-pb-custom-css-box #custom-css {
+	height: 390px;
+}
+#ig-pb-custom-css-box .CodeMirror {
+	border: #ccc solid 1px;
+	height: 390px;
 }

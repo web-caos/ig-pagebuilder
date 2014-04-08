@@ -3,7 +3,7 @@
  */
 jQuery( function ( $ ) {
 
-	// move Pagebuilder box to content of "Page Builder" tab
+	// move IG PageBuilder box to content of "Page Builder" tab
 	$( '#ig_page_builder' )
 	.insertAfter( '#ig_before_pagebuilder' )
 	.addClass( 'jsn-bootstrap' )
@@ -17,7 +17,7 @@ jQuery( function ( $ ) {
 	// remove pagebuilder metabox
 	$('#ig_page_builder').remove();
 
-    // Show Pagebuilder only when Click "Page Builder" tab
+    // Show IG PageBuilder only when Click "Page Builder" tab
     $(document).ready(function() {
         $('#ig_page_builder').show();
 
@@ -34,7 +34,7 @@ jQuery( function ( $ ) {
             $('#ig_editor_tabs a').eq('1').trigger('click',[true]);
         }
 
-        // hide Pagebuilder UI if pagebuilder is deactivate on this page
+        // hide IG PageBuilder UI if pagebuilder is deactivate on this page
         if($("#ig_deactivate_pb").val() == "1"){
             $(".switchmode-button[id='status-off']").trigger('click', [true]);
         }
@@ -58,17 +58,20 @@ jQuery( function ( $ ) {
             });
 
             function _update_content(callback) {
-                var tab_content = '';
-                $("#form-container textarea[name^='shortcode_content']").each(function(){
-                    tab_content += $(this).val();
-                });
+                // if this change doesn't come from Classic Editor tab
+                if( ! $('#TB_window #ig-shortcodes').is(':visible') ) {
+                    var tab_content = '';
+                    $("#form-container textarea[name^='shortcode_content']").each(function(){
+                        tab_content += $(this).val();
+                    });
 
-                if(tinymce.activeEditor)
-                    tinymce.activeEditor.setContent(tab_content);
-                $("#ig_editor_tab1 #content").val(tab_content);
+                    if(tinymce.activeEditor)
+                        tinymce.activeEditor.setContent(tab_content);
+                    $("#ig_editor_tab1 #content").val(tab_content);
 
-                if(callback)
-                    callback();
+                    if(callback)
+                        callback();
+                }
             }
         });
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -46,7 +46,11 @@ if ( ! class_exists( 'IG_Column' ) ) {
 			$column_html    = empty($content) ? '' : IG_Pb_Helper_Shortcode::do_shortcode_admin( $content, true );
 			$span           = ( ! empty($this->params['span'] ) ) ? $this->params['span'] : 'span12';
 			$shortcode_data = '[' . $this->config['shortcode'] . ' span="' . $span . '"]';
-			$rnd_id         = IG_Pb_Utils_Common::random_string();
+			
+			// Remove empty value attributes of shortcode tag.
+			$shortcode_data	= preg_replace( '/\[*([a-z_]*[\n\s\t]*=[\n\s\t]*"")/', '', $shortcode_data );
+			
+			$rnd_id   = IG_Pb_Utils_Common::random_string();
 			$column[] = '<div class="jsn-column-container clearafter shortcode-container ">
 							<div class="jsn-column ' . $span . '">
 								<div class="thumbnail clearafter">

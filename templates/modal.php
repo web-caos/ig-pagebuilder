@@ -1,7 +1,7 @@
 <?php
 /**
  * @version	$Id$
- * @package	IG Pagebuilder
+ * @package	IG PageBuilder
  * @author	 InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license	GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -55,7 +55,7 @@ if ( ! empty( $shortcode ) ) {
 
 			// get Modal setting box
 			$settings = $instance->items;
-			$data['content'] = IG_Pb_Objects_Modal::get_shortcode_modal_settings( $settings, $shortcode, $extract_params );
+			$data['content'] = IG_Pb_Objects_Modal::get_shortcode_modal_settings( $settings, $shortcode, $extract_params, $params );
 			echo balanceTags( $data['content'] );
 		}
 	}
@@ -86,6 +86,7 @@ if ( ! empty( $shortcode ) ) {
 			$content_ = ucfirst( $tab );
 			$tabs[] = "<li class='$active'>" . IG_Pb_Objects_Modal::tab_settings( 'a', $data_, $content_ ) . '</li>';
 		}
+
 		// content
 		$contents   = array();
 		$contents[] = "<div class='tab-pane active' id='content'><form id='ig-widget-form'>$form</form></div>";
@@ -96,9 +97,9 @@ if ( ! empty( $shortcode ) ) {
 		echo balanceTags( $output );
 	}
 	?>
-	<div id="modalAction"></div>
+                <div id="modalAction" class="ig-pb-setting-tab"></div>
 			</div>
-			<textarea class="hidden" id="shortcode_content"><?php echo esc_attr( $params ); ?></textarea>
+            <textarea class="hidden" id="shortcode_content"><?php echo esc_attr( $params ); ?></textarea>
 			<textarea class="hidden" id="ig_share_data"  ></textarea>
 			<textarea class="hidden" id="ig_merge_data"  ></textarea>
 			<textarea class="hidden" id="ig_extract_data"  ></textarea>

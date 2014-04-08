@@ -49,3 +49,28 @@ iframe, object, video {
 .tipsy img {
     float: none !important;
 }
+
+/* === social icons === */
+.contentclips-text ul.ig-social-links li a.facebook {
+	background: url(../images/icon-socials/facebook.png) no-repeat 2px 3px #ECEEF5;
+    border: 1px solid #CAD4E7;
+    width: 20px;
+}
+.contentclips-text ul.ig-social-links li a.facebook:hover {
+	border-color: #9DACCE;
+}
+.contentclips-text ul.ig-social-links li a.twitter {
+	background: url(../images/icon-socials/twitter.png) no-repeat 2px 5px #EEE;
+	border: 1px solid #CCC;
+	width: 22px;
+}
+.contentclips-text ul.ig-social-links li a.googleplus {
+	background: url(../images/icon-socials/gplus.png) no-repeat 8px 2px;
+	border: 1px solid rgba(0, 0, 0, 0.17);
+	width: 42px;
+}
+
+/*------   Full width   ------*/
+.ig-full-width {
+    overflow-x: hidden;
+}

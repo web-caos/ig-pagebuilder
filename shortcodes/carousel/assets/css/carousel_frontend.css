@@ -1,0 +1,21 @@
+/* Carousel */
+.jsn-master .jsn-bootstrap .carousel {
+	max-width: 100%;
+}
+.jsn-master .jsn-bootstrap .carousel .carousel-content
+{
+	padding: 0 50px;
+}
+
+.jsn-master .jsn-bootstrap .carousel .carousel-control span{
+	position: absolute;
+	top: 50%;
+}
+
+.jsn-master .jsn-bootstrap .carousel .carousel-control span.icon-arrow-left {	
+	left: 20px;
+}
+
+.jsn-master .jsn-bootstrap .carousel .carousel-control span.icon-arrow-right {	
+	right: 20px;
+}

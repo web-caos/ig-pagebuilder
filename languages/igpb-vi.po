@@ -2050,7 +2050,7 @@ msgid "Compact"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/templates/page-builder.php:46
-msgid "PageBuilder is currently off."
+msgid "PageBuilder for this page is currently off."
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/templates/page-builder.php:52

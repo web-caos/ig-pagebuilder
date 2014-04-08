@@ -36,11 +36,11 @@ String.prototype.custom_sprintf = function() {
 /**
  * Add placeholder to string
  * Ex:	data.replace(/&lt;/g, '&_IG_WRAPPER_TAG_lt;') => ig_pb_add_placeholder( data, '&lt;', 'index', '&l{0}t;')
-*/ 
+*/
 function ig_pb_add_placeholder( $string, $replace, $placeholder, $expression ){
 	if ( !( $placeholders[$placeholder] ) )
 		return NULL;
-	
+	$replace = $replace.replace('/', '\\/')
     var regexp = new RegExp($replace, "g");
 	if ( !( $expression ) )
 		return $string.replace( regexp, $placeholders[$placeholder] );
@@ -52,7 +52,7 @@ function ig_pb_add_placeholder( $string, $replace, $placeholder, $expression ){
 /**
  * Replace placeholder with real value
  * Ex:	html.replace(/_IG_INDEX_/g, value) => ig_pb_remove_placeholder(html, 'index', value)
-*/ 
+*/
 function ig_pb_remove_placeholder( $string, $placeholder, $value ){
 	if ( !( $placeholders[$placeholder] ) )
 		return $string;

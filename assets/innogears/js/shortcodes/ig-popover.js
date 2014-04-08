@@ -38,9 +38,10 @@
             this_.container.find(".element-action-edit").click(function (e) {
                 this_.openActionSettings(this_, $(this));
                 $.HandleSetting.select2_color();
-                // fix Font selector error
-                new $.IGSelectFonts();
-                new $.IGColorPicker();
+                if($('#shortcode_name').val() == 'ig_contentclips'){
+                    new $.IGSelectFonts();
+                    new $.IGColorPicker();
+                }
                 setTimeout(function(){
                     $('#modalAction .combo-item').each(function(){
                         if($(this).find('.select2-container').length == 2){

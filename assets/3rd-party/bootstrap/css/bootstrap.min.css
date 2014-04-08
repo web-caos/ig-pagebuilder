@@ -7,7 +7,7 @@
  *
  * Designed and built with all the love in the world @twitter by @mdo and @fat.
  */
-.jsn-bootstrap  .clearfix{*zoom:1}
+.jsn-bootstrap .clearfix{*zoom:1}
 .jsn-bootstrap .clearfix:before,.jsn-bootstrap .clearfix:after{display:table;line-height:0;content:""}
 .jsn-bootstrap .clearfix:after{clear:both}
 .jsn-bootstrap .hide-text{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}

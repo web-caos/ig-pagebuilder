@@ -1,7 +1,7 @@
 <?php
 /**
  * @version	$Id$
- * @package	IG Pagebuilder
+ * @package	IG PageBuilder
  * @author	 InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license	GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,40 +27,38 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 		// add shortcode
 		add_shortcode( $this->config['shortcode'], array( &$this, 'element_shortcode' ) );
 
-		// enqueue script for current element in backend (modal setting iframe)
+		// enqueue assets for current element in backend (modal setting iframe)
 		if ( IG_Pb_Helper_Functions::is_modal_of_element( $this->config['shortcode'] ) ) {
-			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts_modal' ) );
+			add_action( 'pb_admin_enqueue_scripts', array( &$this, 'enqueue_assets_modal' ) );
 		}
-		// enqueue script for current element in backend (preview iframe)
+
+		// enqueue assets for current element in backend (preview iframe)
 		if ( IG_Pb_Helper_Functions::is_preview() ) {
-			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts_frontend' ) );
+			add_action( 'pb_admin_enqueue_scripts', array( &$this, 'enqueue_assets_frontend' ) );
 		}
 
 		do_action( 'ig_pb_element_init' );
 
-		$prefix = IG_Pb_Helper_Functions::is_preview() ? 'admin' : 'wp';
-		add_action( "{$prefix}_footer", array( &$this, 'custom_scripts_frontend' ) );
-		add_filter( 'custom_scripts_frontend_filter', array( &$this, 'custom_scripts_frontend_filter' ) );
-	}
+		$prefix = IG_Pb_Helper_Functions::is_preview() ? 'pb_admin' : 'wp';
 
-	// custom scripts for frontend
-	public function custom_scripts_frontend() {
+		// enqueue custom assets at footer of frontend/backend
+		add_action( "{$prefix}_footer", array( &$this, 'custom_assets_frontend' ) );
 
 	}
 
-	// custom filter for scripts for frontend
-	public function custom_scripts_frontend_filter( $scripts ) {
-		return $scripts;
+	// custom assets for frontend
+	public function custom_assets_frontend() {
+		// enqueue custom assets here
 	}
 
 	// enqueue scripts for frontend
-	public function enqueue_scripts_frontend() {
-		IG_Pb_Helper_Functions::shortcode_enqueue_js( $this, 'require_frontend_js', '_frontend' );
+	public function enqueue_assets_frontend() {
+		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_frontend_js', '_frontend' );
 	}
 
 	// enqueue scripts for modal setting iframe
-	public function enqueue_scripts_modal( $hook ) {
-		IG_Pb_Helper_Functions::shortcode_enqueue_js( $this, 'require_js', '' );
+	public function enqueue_assets_modal( $hook ) {
+		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_js', '' );
 	}
 
 	// define configuration information of shortcode
@@ -128,7 +126,7 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 	 *
 	 * @param type $content
 	 * @param type $shortcode_data: string stores params (which is modified default value) of shortcode
-	 * @param type $el_title: Element Title used to identifying elements in Pagebuilder
+	 * @param type $el_title: Element Title used to identifying elements in IG PageBuilder
 	 * Ex:  param-tag=h6&param-text=Your+heading&param-font=custom&param-font-family=arial
 	 * @return type
 	 */
@@ -237,7 +235,8 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 		}
 
 		// enqueue script for current element in frontend
-		add_action( 'wp_footer', array( &$this, 'enqueue_scripts_frontend' ), 1 );
+		add_action( 'wp_footer', array( &$this, 'enqueue_assets_frontend' ), 1 );
+
 		// get full shortcode content
 		return $this->element_shortcode_full( $atts, $content );
 	}

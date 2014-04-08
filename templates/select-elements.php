@@ -1,7 +1,7 @@
 <?php
 /**
  * @version	$Id$
- * @package	IG Pagebuilder
+ * @package	IG PageBuilder
  * @author	 InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license	GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -39,6 +39,7 @@ if ( empty ($elements) || empty ( $elements['element'] ) ) {
 								<select class="jsn-filter-button input-large">
 									<option value="element" selected><?php _e( 'Page Elements', IGPBL ) ?></option>
 									<option value="widget"><?php _e( 'Widgets', IGPBL ) ?></option>
+									<option value="shortcode"><?php _e( 'PageBuilder Shortcode', IGPBL ) ?></option>
 								</select>
 							</div>
 							<div class="pull-right jsn-quick-search">
@@ -62,6 +63,11 @@ if ( empty ($elements) || empty ( $elements['element'] ) ) {
 		echo balanceTags( IG_Pb_Shortcode_Element::el_button( $extra_, $config ) );
 	}
 	?>
+						<!-- Generate text area to add element from raw shortcode -->
+						<li class="jsn-item full-width" data-value='raw' data-type='"shortcode"'>
+							<textarea id="raw_shortcode"></textarea>
+							<div class="text-center"><button class="shortcode-item btn btn-success" data-shortcode="raw" id="rawshortcode-add"><?php _e( 'Add Element', IGPBL ); ?></button></div>
+						</li>
 					</ul>
 				</div>
 			</div>

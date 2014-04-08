@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * Uninstalling IG Pagebuilder: deletes post metas & options
+ * Uninstalling IG PageBuilder: deletes post metas & options
  *
  * @author		InnoGears Team <support@www.innogears.com>
  * @package		IGPGBLDR
@@ -14,7 +14,7 @@ if ( $providers ) {
 	$providers    = unserialize( $providers );
 	$list_plugins = array();
 	foreach ( $providers as $provider ) {
-		if ( isset ( $provider['file'] ) ) {
+		if ( ! empty ( $provider['file'] ) ) {
 			$list_plugins[] = $provider['file'];
 		}
 	}
@@ -31,4 +31,4 @@ include_once 'core/utils/common.php';
 IG_Pb_Utils_Common::remove_cache_folder();
 
 // delele meta key
-IG_Pb_Utils_Common::delete_meta_key( array( '_ig_page_builder_content', '_ig_html_content', '_ig_page_active_tab', '_ig_post_view_count', '_ig_deactivate_pb' ) );
+IG_Pb_Utils_Common::delete_meta_key( array( '_ig_page_builder_content', '_ig_html_content', '_ig_page_active_tab', '_ig_post_view_count', '_ig_deactivate_pb', '_ig_page_builder_css_files', '_ig_page_builder_css_custom' ) );

@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -28,7 +28,7 @@ class IG_Pb_Shortcode_Layout extends IG_Pb_Shortcode_Common {
 
 		// enqueue custom script for current element
 		if ( IG_Pb_Helper_Functions::is_modal_of_element( $this->config['shortcode'] ) ) {
-			IG_Pb_Helper_Functions::shortcode_enqueue_js( $this, '', '' );
+			IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_js', '' );
 		}
 	}
 

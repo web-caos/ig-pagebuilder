@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,6 +25,9 @@ if ( ! class_exists( 'IG_Row' ) ) {
 		 */
 		function element_config() {
 			$this->config['shortcode'] = strtolower( __CLASS__ );
+			$this->config['exception'] = array(
+				'require_js'       => array( 'row.js' ),
+			);
 		}
 
 		/**
@@ -238,7 +241,11 @@ if ( ! class_exists( 'IG_Row' ) ) {
 			// remove [/ig_row][ig_column...] from $shortcode_data
 			$shortcode_data = explode( '][', $shortcode_data );
 			$shortcode_data = $shortcode_data[0] . ']';
-			$custom_style   = IG_Pb_Utils_Placeholder::get_placeholder( 'custom_style' );
+			
+			// Remove empty value attributes of shortcode tag.
+			$shortcode_data	= preg_replace( '/\[*([a-z_]*[\n\s\t]*=[\n\s\t]*"")/', '', $shortcode_data );
+						
+			$custom_style = IG_Pb_Utils_Placeholder::get_placeholder( 'custom_style' );
 			$row[] = '<div class="jsn-row-container ui-sortable row-fluid shortcode-container" ' . $custom_style . '>
 							<textarea class="hidden" data-sc-info="shortcode_content" name="shortcode_content[]" >' . $shortcode_data . '</textarea>
 							<div class="jsn-iconbar left">
@@ -270,7 +277,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 		 * define shortcode structure of element
 		 */
 		function element_shortcode( $atts = null, $content = null ) {
-			$extra_class = $style = $common_style = '';
+			$extra_class = $style = $custom_script = '';
 			if ( isset( $atts ) && is_array( $atts ) ) {
 				$arr_styles = array();
 
@@ -278,13 +285,10 @@ if ( ! class_exists( 'IG_Row' ) ) {
 					case 'full':
 						$extra_class = 'ig_fullwidth';
 						// some overwrite css to enable row full width
-						$common_style = '<style>
-						*{-webkit-box-sizing: inherit;-moz-box-sizing: inherit;-ms-box-sizing: inherit;-o-box-sizing: inherit;box-sizing: inherit;}
-						#page, #content, .ig_fullwidth{-webkit-box-sizing: inherit!important;-moz-box-sizing: inherit!important;-ms-box-sizing: inherit!important;-o-box-sizing: inherit!important;box-sizing: inherit!important;}
-						#page{max-width: 100%!important;overflow: hidden;border: none;margin: 0 auto;padding: 0;}
-						</style>';
+						$script = "$('body').addClass('ig-full-width');";
+						$custom_script = IG_Pb_Helper_Functions::script_box( $script );
 
-						$arr_styles[] = 'width: 100%;padding-left: 1000px!important;padding-right: 1000px!important;margin-left: -1000px;';
+						$arr_styles[] = '-webkit-box-sizing: content-box;-moz-box-sizing: content-box;box-sizing: content-box;width: 100%;padding-left: 1000px;padding-right: 1000px;margin:0 -1000px;';
 						break;
 					case 'boxed':
 						///$arr_styles[] = "width: 100%;";
@@ -361,15 +365,18 @@ if ( ! class_exists( 'IG_Row' ) ) {
 
 				$arr_styles[] = "padding-top:{$atts['div_padding_top']}px;";
 				$arr_styles[] = "padding-bottom:{$atts['div_padding_bottom']}px;";
-				$arr_styles[] = "padding-left:{$atts['div_padding_left']}px;";
-				$arr_styles[] = "padding-right:{$atts['div_padding_right']}px;";
+
+				if ( $atts['width'] != 'full' ) {
+					$arr_styles[] = "padding-left:{$atts['div_padding_left']}px;";
+					$arr_styles[] = "padding-right:{$atts['div_padding_right']}px;";
+				}
 
 				$arr_styles = implode( '', $arr_styles );
 				$style = ! empty( $arr_styles ) ? "style='$arr_styles'" : '';
 			}
 			$extra_class .= ! empty ( $atts['css_suffix'] ) ? ' ' . esc_attr( $atts['css_suffix'] ) : '';
 			$extra_class  = ltrim( $extra_class, ' ' );
-			return $common_style . "<div class='jsn-bootstrap'>" . "<div class='row $extra_class' $style>" . IG_Pb_Helper_Shortcode::remove_autop( $content ) . '</div>' . '</div>';
+			return $custom_script . "<div class='jsn-bootstrap'>" . "<div class='row $extra_class' $style>" . IG_Pb_Helper_Shortcode::remove_autop( $content ) . '</div>' . '</div>';
 		}
 
 	}

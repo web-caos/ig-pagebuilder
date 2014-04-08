@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,6 +18,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		static $item_html_template = array(
 			'icon' => "<i class='_IG_STD_'></i>",
 		);
+		static $notice = array();
 
 		/**
 		 * Get list of (element + layout) shortcodes from shortcode folders
@@ -25,24 +26,26 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 */
 		public static function ig_pb_shortcode_tags() {
 
-            $source_zip = plugin_dir_path( IG_PB_FILE ) . 'ig-shortcodes-free' . '.zip';
-            if ( ! ( file_exists( $source_zip ) ) ){
-                do_action( 'ig_pb_third_party' );
-            } else {
-                $IG_Pb_Utils_Plugin = new IG_Pb_Utils_Plugin();
-                $IG_Pb_Utils_Plugin->do_activate();
-                $IG_Pb_Utils_Plugin->activate_plugin();
+			// Do action to register addon providers
+			do_action( 'ig_pb_addon' );
 
-            }
-
-
+			// Get list of providers
 			global $Ig_Sc_Providers;
 			$Ig_Sc_Providers = apply_filters(
-					'ig_pb_provider',
-					self::this_provider()
+				'ig_pb_provider',
+				self::this_provider()
 			);
+
+			// compatibility check
+			self::compatibility_check();
+
+			// show notice
+			add_action( 'admin_notices', array( __CLASS__, 'show_notice' ), 100 );
+
+			// Save providers info to transient, use for unistall
 			set_transient( '_ig_pb_providers', serialize( $Ig_Sc_Providers ) );
 
+			// Get list of shortcode directories
 			$sc_path = self::shortcode_dirs();
 
 			foreach ( $sc_path as $path ) {
@@ -55,50 +58,101 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 				}
 			}
 
+			// Get list of shortcodes
 			$shortcodes = self::shortcodes_list( $sc_path );
+
 			return $shortcodes;
 		}
 
+		/**
+		 * Check compatibility of Addons vs Core
+		 *
+		 * @global type $Ig_Sc_Providers
+		 */
+		public static function compatibility_check() {
+
+			global $Ig_Sc_Providers;
+			$providers = $Ig_Sc_Providers;
+
+			// get current version of core
+			$core_version = IG_Pb_Helper_Functions::get_plugin_info( IG_PB_FILE, 'Version' );
+
+			foreach ( $providers as $dir => $provider ) {
+				if ( ! empty ( $provider['file'] ) && ! empty ( $provider['path'] ) ) {
+
+					$addon_file = $provider['file'];
+
+					// get value of core version required
+					$core_required = IG_Pb_Addon::core_version_requied_value( $provider, $addon_file );
+
+					if ( $core_required ) {
+						// addon plugin name
+						$addon_name = IG_Pb_Helper_Functions::get_plugin_info( $provider['file_path'], 'Name' );
+
+						$compatibility = IG_Pb_Addon::compatibility_handle( $core_required, $core_version, $addon_file );
+
+						if ( ! $compatibility ) {
+							// remove provider from list
+							unset ( $Ig_Sc_Providers[$dir] );
+
+							// show notice
+							self::$notice[] = IG_Pb_Addon::show_notice( array( 'addon_name' => $addon_name, 'core_required' => $core_required ), 'core_required' );
+						}
+					}
+				}
+			}
+		}
+
+		/**
+		 * Show notice on top of admin pages
+		 */
+		public static function show_notice() {
+			if ( self::$notice ) {
+				echo balanceTags( implode( '', self::$notice ) );
+			}
+		}
+
 		// autoload shortcodes & sub shortcodes
-		public static function autoload_shortcodes( $path ){
+		public static function autoload_shortcodes( $path ) {
 			$items   = substr_count( $path, '/item' );
 			$postfix = str_repeat( 'Item_', $items );
 			// autoload shortcodes
-			IG_Pb_Loader::register( $path, 'IG_' . $postfix );
+			IG_Loader::register( $path, 'IG_' . $postfix );
 		}
 
 		// set information for InnoGears provider
-		public static function this_provider(){
+		public static function this_provider() {
 			return array(
-						plugin_dir_path( IG_PB_FILE ) =>
-							array(
-								'path' => IG_PB_PATH,
-								'uri' => IG_PB_URI,
-								'name' => 'InnoGears',
-								'shortcode_dir' => array( IG_PB_LAYOUT_PATH ), //array( IG_PB_LAYOUT_PATH, IG_PB_ELEMENT_PATH ),
-								'js_shortcode_dir' => array(
-										'path' => IG_PB_PATH . 'assets/innogears/js/shortcodes',
-										'uri' => IG_PB_URI . 'assets/innogears/js/shortcodes',
-									),
-							)
-						);
+				plugin_dir_path( IG_PB_FILE ) =>
+					array(
+						'path'             => IG_PB_PATH,
+						'uri'              => IG_PB_URI,
+						'name'             => 'InnoGears',
+						'shortcode_dir'    => array( IG_PB_LAYOUT_PATH ), //array( IG_PB_LAYOUT_PATH, IG_PB_ELEMENT_PATH ),
+						'js_shortcode_dir' => array(
+							'path' => IG_PB_PATH . 'assets/innogears/js/shortcodes',
+							'uri'  => IG_PB_URI . 'assets/innogears/js/shortcodes',
+						),
+					)
+			);
 		}
 
 		/**
 		 * Get provider name & path of a shortcode directory
 		 *
 		 * @param type $shortcode_dir
+		 *
 		 * @return type
 		 */
-		private static function get_provider( $shortcode_dir ){
+		private static function get_provider( $shortcode_dir ) {
 			global $Ig_Sc_Providers;
 			$providers = $Ig_Sc_Providers;
 			foreach ( $providers as $dir => $provider ) {
-				foreach ( $provider['shortcode_dir'] as $dir ) {
-					if ( strpos( $shortcode_dir, $dir ) !== false ){
+				foreach ( (array) $provider['shortcode_dir'] as $dir ) {
+					if ( strpos( $shortcode_dir, $dir ) !== false ) {
 						return array(
 							'name' => $provider['name'],
-							'dir' => $dir,
+							'dir'  => $dir,
 						);
 					}
 				}
@@ -108,23 +162,25 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		/**
 		 * Get info of provider of the shortcode
 		 *
-		 * @global type $Ig_Sc_Providers, $Ig_Sc_By_Providers
-		 * @param type $shortcode_name
-		 * @param type $shortcode_by_providers
+		 * @global type $Ig_Sc_Providers , $Ig_Sc_By_Providers
+		 *
+		 * @param type  $shortcode_name
+		 * @param type  $shortcode_by_providers
+		 *
 		 * @return type
 		 */
-		public static function get_provider_info( $shortcode_name, $info ){
+		public static function get_provider_info( $shortcode_name, $info ) {
 			global $Ig_Sc_Providers;
 			global $Ig_Sc_By_Providers;
-			$providers = $Ig_Sc_Providers;
+			$providers              = $Ig_Sc_Providers;
 			$shortcode_by_providers = $Ig_Sc_By_Providers;
 			foreach ( $shortcode_by_providers as $provider_dir => $shortcodes ) {
 				// find shortcode in what directory
-				if ( in_array( $shortcode_name, $shortcodes ) ){
+				if ( in_array( $shortcode_name, $shortcodes ) ) {
 					// find provider of that directory
 					foreach ( $providers as $dir => $provider ) {
-						foreach ( $provider['shortcode_dir'] as $dir ) {
-							if ( $provider_dir == $dir ){
+						foreach ( (array) $provider['shortcode_dir'] as $dir ) {
+							if ( $provider_dir == $dir ) {
 								return $Ig_Sc_Providers[$provider['path']][$info];
 							}
 						}
@@ -137,24 +193,28 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Get shortcode directories of providers
 		 * @return type
 		 */
-		public static function shortcode_dirs( ){
+		public static function shortcode_dirs() {
 			global $Ig_Sc_Providers;
-			$providers = $Ig_Sc_Providers;
+			$providers      = $Ig_Sc_Providers;
 			$shortcode_dirs = array();
 			foreach ( $providers as $provider ) {
-				$shortcode_dirs = array_merge( $shortcode_dirs, $provider['shortcode_dir'] );
+				$shortcode_dirs = array_merge( $shortcode_dirs, (array) $provider['shortcode_dir'] );
 			}
+
 			return $shortcode_dirs;
 		}
 
 		/**
 		 * Get shortcodes in shortcode directories
+		 *
 		 * @param array $sc_path
+		 *
 		 * @return array
 		 */
 		public static function shortcodes_list( $sc_path ) {
-			if ( empty( $sc_path ) )
+			if ( empty( $sc_path ) ) {
 				return NULL;
+			}
 			if ( ! is_array( $sc_path ) ) {
 				$sc_path = array( $sc_path );
 			}
@@ -177,18 +237,24 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 					$parent_path = str_replace( '/item', '', $dir );
 					$provider    = self::get_provider( $parent_path );
 					// shortcode info
-					$type   = ( $dir == IG_PB_LAYOUT_PATH ) ? 'layout' : 'element';
+					$type       = ( $dir == IG_PB_LAYOUT_PATH ) ? 'layout' : 'element';
 					$this_level = ( intval( $level ) > 0 ) ? ( intval( $level ) - 1 ) : intval( $level );
 					$append     = str_repeat( 'item_', $this_level );
-					foreach ( glob( $dir . '/*.php' ) as $file ) {
-						$p = pathinfo( $file );
-						$element = str_replace( '-', '_', $p['filename'] );
-						$shortcode_name = 'ig_' . $append . $element;
-						$shortcodes[$shortcode_name] = array( 'type' => $type, 'provider' => $provider );
-						$Ig_Sc_By_Providers[$provider['dir']][] = $shortcode_name;
+					if ( count( glob( $dir . '/*.php' ) ) > 0 ) {
+						foreach ( glob( $dir . '/*.php' ) as $file ) {
+							// Skip including main initialization file
+							if ( 'main.php' != substr( $file, - 8 ) ) {
+								$p                                      = pathinfo( $file );
+								$element                                = str_replace( '-', '_', $p['filename'] );
+								$shortcode_name                         = 'ig_' . $append . $element;
+								$shortcodes[$shortcode_name]            = array( 'type' => $type, 'provider' => $provider );
+								$Ig_Sc_By_Providers[$provider['dir']][] = $shortcode_name;
+							}
+						}
 					}
 				}
 			}
+
 			return $shortcodes;
 		}
 
@@ -197,6 +263,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Ex: [param-tag=h3&param-text=Your+heading+text&param-font=custom]
 		 *
 		 * @param type $param_str
+		 *
 		 * @return array
 		 */
 		static function extract_params( $param_str, $str_shortcode = '' ) {
@@ -215,19 +282,21 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			}
 			$pattern = get_shortcode_regex();
 			preg_match_all( '/' . $pattern . '/s', $param_str, $tmp_params, PREG_PATTERN_ORDER );
-			$content = isset( $tmp_params[5][0] ) ? trim( $tmp_params[5][0] ) : '';
-			$content = preg_replace( '/rich_content_param-[a-z_]+=/', '', $content );
+			$content                    = isset( $tmp_params[5][0] ) ? trim( $tmp_params[5][0] ) : '';
+			$content                    = preg_replace( '/rich_content_param-[a-z_]+=/', '', $content );
 			$params['sc_inner_content'] = $content;
+
 			return $params;
 		}
 
 		/**
 		 * Generate params list of shortcode (from $this->items array) OR get value of a param
 		 *
-		 * @param type $arr	($this->items)
-		 * @param type $paramID (get std of a param by its ID)
-		 * @param type $filter_arr (re-assign value for some params ( "pram id" => "new std value" ))
+		 * @param type $arr            ($this->items)
+		 * @param type $paramID        (get std of a param by its ID)
+		 * @param type $filter_arr     (re-assign value for some params ( "pram id" => "new std value" ))
 		 * @param type $assign_content (assign content of $filter_arr['sc_inner_content'] to the param which has role = 'content')
+		 *
 		 * @return type
 		 */
 		static function generate_shortcode_params( &$arr, $paramID = NULL, $filter_arr = NULL, $assign_content = FALSE, $extract_content = FALSE, $assign_title = '' ) {
@@ -235,19 +304,19 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			if ( $arr ) {
 				foreach ( $arr as $tab => &$options ) {
 					foreach ( $options as &$option ) {
-						$type = isset( $option['type'] ) ? $option['type'] : '';
+						$type          = isset( $option['type'] ) ? $option['type'] : '';
 						$option['std'] = ! isset( $option['std'] ) ? '' : $option['std'];
 
-						if ( isset($option['role'] ) && $option['role'] == 'content' ) {
+						if ( isset( $option['role'] ) && $option['role'] == 'content' ) {
 							if ( $assign_content ) {
-								if ( ! empty($filter_arr ) && isset( $filter_arr['sc_inner_content']) )
+								if ( ! empty( $filter_arr ) && isset( $filter_arr['sc_inner_content'] ) )
 									$option['std'] = $filter_arr['sc_inner_content'];
 							}
 							if ( $extract_content ) {
 								$params['sub_sc_extract_content'][$option['id']] = $option['std'];
 							} else {
 								// remove option which role = content from Shortcode structure ( except option which has another role: title )
-								if ( ! ( ( isset( $option['role'] ) && $option['role'] == 'title' ) || ( isset($option['role_2'] ) && $option['role_2'] == 'title') || ( isset($option['role'] ) && $option['role'] == 'title_prepend' ) ) ) {
+								if ( ! ( ( isset( $option['role'] ) && $option['role'] == 'title' ) || ( isset( $option['role_2'] ) && $option['role_2'] == 'title' ) || ( isset( $option['role'] ) && $option['role'] == 'title_prepend' ) ) ) {
 									unset( $option );
 									continue;
 								}
@@ -260,24 +329,23 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 										if ( ! empty( $paramID ) ) {
 											if ( $option['id'] == $paramID )
 												return $option['std'];
-										}
-										else if ( isset( $option['id'] ) )
+										} else if ( isset( $option['id'] ) )
 											$params[$option['id']] = $option['std'];
-									}else {
-										if ( isset($option['id'] ) && array_key_exists( $option['id'], $filter_arr ) )
+									} else {
+										if ( isset( $option['id'] ) && array_key_exists( $option['id'], $filter_arr ) )
 											$option['std'] = $filter_arr[$option['id']];
 									}
 									if ( ! empty( $assign_title ) ) {
 										// default std
 										if ( strpos( $option['std'], IG_Pb_Utils_Placeholder::get_placeholder( 'index' ) ) !== false ) {
-											$option['std'] = '';
+											$option['std']          = '';
 											$params['assign_title'] = __( '(Untitled)', IGPBL );
-										} else if ( (isset($option['role'] ) && $option['role'] == 'title') || ( isset($option['role_2'] ) && $option['role_2'] == 'title' ) ) {
+										} else if ( ( isset( $option['role'] ) && $option['role'] == 'title' ) || ( isset( $option['role_2'] ) && $option['role_2'] == 'title' ) ) {
 											if ( $option['role'] == 'title' )
 												$params['assign_title'] = $option['std'];
 											else
 												$params['assign_title'] = IG_Pb_Utils_Common::slice_content( $option['std'] );
-										} else if ( (isset($option['role'] ) && $option['role'] == 'title_prepend') && ! empty( $option['title_prepend_type'] ) && ! empty( $option['std']) ) {
+										} else if ( ( isset( $option['role'] ) && $option['role'] == 'title_prepend' ) && ! empty( $option['title_prepend_type'] ) && ! empty( $option['std'] ) ) {
 											$params['assign_title'] = IG_Pb_Utils_Placeholder::remove_placeholder( self::$item_html_template[$option['title_prepend_type']], 'standard_value', $option['std'] ) . $params['assign_title'];
 										}
 									}
@@ -289,22 +357,20 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 											if ( ! empty( $paramID ) ) {
 												if ( $sub_items['id'] == $paramID )
 													return $sub_items['std'];
-											}
-											else
+											} else
 												$params['sub_sc_content'][] = $sub_items;
 										}
-									}
-									else {
+									} else {
 										// Assign Content For Sub-Shortcode
 										$count_default = count( $option['sub_items'] );
 										$count_real    = isset( $filter_arr['sub_sc_content'] ) ? count( $filter_arr['sub_sc_content'] ) : 0;
 										if ( $count_real > 0 ) {
 											if ( $count_default < $count_real ) {
-												for ( $index = $count_default; $index < $count_real; $index++ ) {
+												for ( $index = $count_default; $index < $count_real; $index ++ ) {
 													$option['sub_items'][$index] = array( 'std' => '' );
 												}
 											} elseif ( $count_default > $count_real ) {
-												for ( $index = $count_real; $index < $count_default; $index++ ) {
+												for ( $index = $count_real; $index < $count_default; $index ++ ) {
 													unset( $option['sub_items'][$index] );
 												}
 											}
@@ -319,12 +385,10 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 										if ( ! empty( $paramID ) ) {
 											if ( $sub_options['id'] == $paramID )
 												return $sub_options['std'];
-										}
-										else
+										} else
 											$params[$sub_options['id']] = $sub_options['std'];
 									}
-								}
-								else {
+								} else {
 									array_walk( $option['type'], array( 'IG_Pb_Helper_Functions', 'ig_arr_walk' ), $filter_arr );
 								}
 							}
@@ -338,6 +402,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 					}
 				}
 			}
+
 			return $params;
 		}
 
@@ -346,12 +411,13 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 *
 		 * @param type $shortcode_name
 		 * @param type $params
+		 *
 		 * @return type
 		 */
 		static function generate_shortcode_structure( $shortcode_name, $params, $content = '' ) {
 			$shortcode_structure = "[$shortcode_name ";
 
-			$arr = array();
+			$arr            = array();
 			$exclude_params = array( 'sub_sc_content', 'sub_sc_extract_content' );
 			foreach ( $params as $key => $value ) {
 				if ( ! in_array( $key, $exclude_params ) && $key != '' )
@@ -372,19 +438,23 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			$shortcode_structure .= ']';
 			$shortcode_structure .= $content;
 			$shortcode_structure .= "[/$shortcode_name]";
+
 			return $shortcode_structure;
 		}
 
 		/**
 		 * Get Shortcode class from shortcode name
+		 *
 		 * @param type $shortcode_name
+		 *
 		 * @return type
 		 */
 		static function get_shortcode_class( $shortcode_name ) {
 			$shortcode_name = str_replace( 'ig_', 'IG_', $shortcode_name );
-			$shortcode = str_replace( '_', ' ', $shortcode_name );
-			$class = ucwords( $shortcode );
-			$class = str_replace( ' ', '_', $class );
+			$shortcode      = str_replace( '_', ' ', $shortcode_name );
+			$class          = ucwords( $shortcode );
+			$class          = str_replace( ' ', '_', $class );
+
 			return $class;
 		}
 
@@ -392,9 +462,10 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Return shortcode name without 'ig_' prefix
 		 *
 		 * @param type $ig_shortcode_name
+		 *
 		 * @return type
 		 */
-		static function shortcode_name( $ig_shortcode_name ){
+		static function shortcode_name( $ig_shortcode_name ) {
 			return str_replace( 'ig_', '', $ig_shortcode_name );
 		}
 
@@ -402,11 +473,12 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Removes wordpress autop and invalid nesting of p tags, as well as br tags
 		 *
 		 * @param string $content html content by the wordpress editor
+		 *
 		 * @return string $content
 		 */
 		static function remove_autop( $content ) {
 			$shortcode_tags = array();
-			$tagregexp = join( '|', array_map( 'preg_quote', $shortcode_tags ) );
+			$tagregexp      = join( '|', array_map( 'preg_quote', $shortcode_tags ) );
 
 			// opening tag
 			$content = preg_replace( "/(<p>)?\[($tagregexp)(\s[^\]]+)?\](<\/p>|<br\s\/>)?/", '[$2$3]', $content );
@@ -423,48 +495,51 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		/**
 		 * Generate shortcode pattern ( for Ig shortcodes only )
 		 * @global type $shortcode_tags
-		 * @return pattern which contains only shortcodes of Ig Pagebuilder
+		 * @return pattern which contains only shortcodes of IG PageBuilder
 		 */
 		public static function shortcodes_pattern( $tags = '' ) {
 			global $Ig_Pb_Shortcodes;
 			global $shortcode_tags;
 			$shortcode_tags_clone = $shortcode_tags;
 			$shortcode_tags       = empty( $tags ) ? ( ! empty ( $Ig_Pb_Shortcodes ) ? $Ig_Pb_Shortcodes : IG_Pb_Helper_Shortcode::ig_pb_shortcode_tags() ) : $tags;
-			$pattern			  = get_shortcode_regex();
+			$pattern              = get_shortcode_regex();
 			$shortcode_tags       = $shortcode_tags_clone;
+
 			return "/$pattern/s";
 		}
 
 		/**
 		 * Remove all Ig shortcodes from content
+		 *
 		 * @param string $content
+		 *
 		 * @return string Content without shortcode tags
 		 */
 		public static function remove_ig_shortcodes( $content ) {
 			global $Ig_Pb_Shortcodes;
 			$ig_shortcode_tags = ! empty ( $Ig_Pb_Shortcodes ) ? $Ig_Pb_Shortcodes : IG_Pb_Helper_Shortcode::ig_pb_shortcode_tags();
-			$tagnames		  = array_keys( $ig_shortcode_tags );
-			$tagregexp		 = join( '|', array_map( 'preg_quote', $tagnames ) );
+			$tagnames          = array_keys( $ig_shortcode_tags );
+			$tagregexp         = join( '|', array_map( 'preg_quote', $tagnames ) );
 
 			// replace opening tag
-			$regex   = '\\['						   // Opening bracket
-					. '(\\[?)'					   // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
-					. "($tagregexp)"				 // 2: Shortcode name
-					. '(?![\\w-])'				   // Not followed by word character or hyphen
-					. '('							// 3: Unroll the loop: Inside the opening shortcode tag
-					. '[^\\]\\/]*'				   // Not a closing bracket or forward slash
-					. '(?:'
-					. '\\/(?!\\])'				   // A forward slash not followed by a closing bracket
-					. '[^\\]\\/]*'				   // Not a closing bracket or forward slash
-					. ')*?'
-					. ')'
-					. '(?:'
-					. '(\\/)'						// 4: Self closing tag ...
-					. '\\]'						  // ... and closing bracket
-					. '|'
-					. '\\]'						  // Closing bracket
-					. ')'
-					. '(\\]?)';					  // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
+			$regex   = '\\[' // Opening bracket
+				. '(\\[?)' // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
+				. "($tagregexp)" // 2: Shortcode name
+				. '(?![\\w-])' // Not followed by word character or hyphen
+				. '(' // 3: Unroll the loop: Inside the opening shortcode tag
+				. '[^\\]\\/]*' // Not a closing bracket or forward slash
+				. '(?:'
+				. '\\/(?!\\])' // A forward slash not followed by a closing bracket
+				. '[^\\]\\/]*' // Not a closing bracket or forward slash
+				. ')*?'
+				. ')'
+				. '(?:'
+				. '(\\/)' // 4: Self closing tag ...
+				. '\\]' // ... and closing bracket
+				. '|'
+				. '\\]' // Closing bracket
+				. ')'
+				. '(\\]?)'; // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
 			$content = preg_replace( "/$regex/s", '<p>', $content );
 
 			// replace closing tag
@@ -475,6 +550,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			$content = preg_replace( '/(<p>)+/', '<p>', $content );
 			$content = preg_replace( '/(<\/p>)+/', '</p>', $content );
 			$content = preg_replace( '/(<p>\s*<\/p>)+/', '', $content );
+
 			return $content;
 		}
 
@@ -485,15 +561,16 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * @param type $content
 		 * @param type $content_flag
 		 * @param type $append_
+		 *
 		 * @return type string
 		 */
 		private static function wrap_content( $pattern, $content, $content_flag, $append_ ) {
-			$nodes      = preg_split( $pattern, $content, -1, PREG_SPLIT_OFFSET_CAPTURE );
+			$nodes      = preg_split( $pattern, $content, - 1, PREG_SPLIT_OFFSET_CAPTURE );
 			$idx_change = 0;
 			foreach ( $nodes as $node ) {
 				$replace   = $node[0];
 				$empty_str = self::check_empty_( $content );
-				if ( strlen( trim( $replace ) ) != 0 && strlen( trim( $empty_str ) ) != 0 ) {
+				if ( strlen( trim( $replace ) ) && strlen( trim( $empty_str ) ) ) {
 					$offset       = intval( $node[1] ) + $idx_change;
 					$replace_html = $replace;
 
@@ -501,22 +578,33 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 					$idx_change += strlen( $append_ ) - strlen( $content_flag ) - ( strlen( $replace ) - strlen( $replace_html ) );
 				}
 			}
+
 			return $content;
 		}
 
-		public static function check_empty_( $content ){
-			$empty_str = preg_replace( '/(<p>)+/', '', $content );
-			$empty_str = preg_replace( '/(<\/p>)+/', '', $content );
-			$empty_str = str_replace( '&nbsp;', '', $content );
-			return $empty_str;
+		/**
+         * Check if string is empty (no real content)
+         *
+         * @param type $content
+         * @return type
+         */
+		public static function check_empty_( $content ) {
+			$content = preg_replace( '/<p[^>]*?>/', '', $content );
+			$content = preg_replace( '/<\/p>/', '', $content );
+			$content = preg_replace( '/["\']/', '', $content );
+			$content = str_replace( '&nbsp;', '', $content );
+
+			return $content;
 		}
+
 		/**
 		 * Rebuild pagebuilder from Shortcode content
 		 *
 		 * @param type $content
-		 * @param type $column: whether this content is wrapped by a column or not
-		 * @param type $refine: true only first time call
-		 * @return type Pagebuilder content for Admin
+		 * @param type $column : whether this content is wrapped by a column or not
+		 * @param type $refine : true only first time call
+		 *
+		 * @return type IG PageBuilder content for Admin
 		 */
 		public static function do_shortcode_admin( $content = '', $column = false, $refine = false ) {
 			if ( empty( $content ) )
@@ -559,16 +647,18 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 
 			// allow [[foo]] syntax for escaping a tag
 			if ( $m[1] == '[' && $m[6] == ']' ) {
-				return substr( $m[0], 1, -1 );
+				return substr( $m[0], 1, - 1 );
 			}
 
 			$tag     = $m[2];
 			$content = isset( $m[5] ) ? trim( $m[5] ) : '';
+
 			return call_user_func( array( 'self', 'shortcode_to_pagebuilder' ), $tag, $content, $m[0], $m[3] );
 		}
 
 		/**
 		 * Return html structure of shortcode in Page Builder area
+		 *
 		 * @param type $shortcode_name
 		 * @param type $attr
 		 * @param type $content
@@ -596,7 +686,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 
 					// get content in pagebuilder of shortcode: Element Title must always first option of Content tab
 
-					if ( isset($instance->items['content'] ) && isset( $instance->items['content'][0]) ) {
+					if ( isset( $instance->items['content'] ) && isset( $instance->items['content'][0] ) ) {
 						$title = $instance->items['content'][0];
 						if ( $title['role'] == 'title' ) {
 							$params   = shortcode_parse_atts( $shortcode_params );
@@ -604,14 +694,15 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 						}
 					}
 				} else {
-					$widget_info = IG_Pb_Helper_Shortcode::extract_widget_params( $shortcode_data );
-					$el_title    = ! empty( $widget_info['title'] ) ? $widget_info['title'] : '';
-					$params      = IG_Pb_Helper_Shortcode::extract_params( $shortcode_data );
+					$widget_info                   = IG_Pb_Helper_Shortcode::extract_widget_params( $shortcode_data );
+					$el_title                      = ! empty( $widget_info['title'] ) ? $widget_info['title'] : '';
+					$params                        = IG_Pb_Helper_Shortcode::extract_params( $shortcode_data );
 					$instance->config['shortcode'] = $params['widget_id'];
 					$instance->config['el_type']   = 'widget';
 				}
 
 				$shortcode_view = $instance->element_in_pgbldr( $content, $shortcode_data, $el_title );
+
 				return $shortcode_view[0];
 			}
 		}
@@ -621,6 +712,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 *
 		 * @param type $content
 		 * @param type $recursion
+		 *
 		 * @return type
 		 */
 		public static function extract_sub_shortcode( $content = '', $recursion = false ) {
@@ -629,6 +721,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			preg_match_all( self::$pattern, $content, $out );
 			if ( $recursion )
 				return self::extract_sub_shortcode( $out[5][0] );
+
 			return $out[0];
 		}
 
@@ -637,6 +730,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 *
 		 * @param type $shortcode_content
 		 * @param type $sub_shortcode_content
+		 *
 		 * @return type
 		 */
 		public static function merge_shortcode_content( $shortcode_content, $sub_shortcode_content ) {
@@ -644,12 +738,13 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 				self::$pattern = self::shortcodes_pattern();
 			preg_match_all( self::$pattern, $shortcode_content, $out );
 
-			$merge_shortcode					  = array();
+			$merge_shortcode                      = array();
 			$merge_shortcode['shortcode_tag']     = "[{$out[2][0]}";
 			$merge_shortcode['shortcode_params']  = "{$out[3][0]}]";
 			$merge_shortcode['shortcode_content'] = $sub_shortcode_content;
 			$merge_shortcode['shortcode_tag_end'] = "[/{$out[2][0]}]";
-			$merge_shortcode					  = implode( '', $merge_shortcode );
+			$merge_shortcode                      = implode( '', $merge_shortcode );
+
 			return stripslashes( $merge_shortcode );
 		}
 
@@ -657,15 +752,17 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Extract setting params of Widget Form
 		 *
 		 * @param type $params
+		 *
 		 * @return type
 		 */
 		public static function extract_widget_params( $params ) {
 			$params = urldecode( $params );
-			$params = preg_replace( '/\[ig_widget\s([A-Za-z0-9_-]+=\"[^"\']*\")*\]/', '', $params );
+			$params = preg_replace( '/\[ig_widget\s+([A-Za-z0-9_-]+=\"[^"\']*\"\s*)*\s*\]/', '', $params );
 			// replace: widget-pages[][title]=Pages 1 => title=Pages 1
 			$params = preg_replace( '/([a-z-_])+\[\]\[([^\[\]]+)\]/', '$2', $params );
 			$params = str_replace( '[/ig_widget]', '', $params );
 			parse_str( $params, $instance );
+
 			return $instance;
 		}
 
@@ -677,9 +774,10 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		public static function doshortcode_content( $ig_pagebuilder_content ) {
 			// remove placeholder text which was inserted to &lt; and &gt;
 			$ig_pagebuilder_content = IG_Pb_Utils_Placeholder::remove_placeholder( $ig_pagebuilder_content, 'wrapper_append', '' );
-			$ig_pagebuilder_content = preg_replace_callback( '/\[ig_widget\s([A-Za-z0-9_-]+=\"[^"\']*\")*\](.*)\[\/ig_widget\]/Us', array( 'self', 'widget_content' ), $ig_pagebuilder_content );
+			$ig_pagebuilder_content = preg_replace_callback( '/\[ig_widget\s+([A-Za-z0-9_-]+=\"[^"\']*\"\s*)*\s*\](.*)\[\/ig_widget\]/Us', array( 'self', 'widget_content' ), $ig_pagebuilder_content );
 
 			$output = do_shortcode( $ig_pagebuilder_content );
+
 			return $output;
 		}
 
@@ -687,6 +785,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		 * Replace widget shortcode by Widget output
 		 *
 		 * @param type $widget_shortcode
+		 *
 		 * @return type
 		 */
 		public static function widget_content( $widget_shortcode ) {
@@ -715,8 +814,10 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 		/**
 		 * Render HTML code for shortcode's parameter type
 		 * (used in shortcode setting modal)
+		 *
 		 * @param string $type Type name
 		 * @param string $element
+		 *
 		 * @return string HTML
 		 */
 		public static function render_parameter( $type, $element = '', $extra_params = null ) {
@@ -725,6 +826,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 			if ( class_exists( $class ) ) {
 				return call_user_func( array( $class, 'render' ), $element, $extra_params );
 			}
+
 			return false;
 		}
 
@@ -737,6 +839,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Shortcode' ) ) {
 					$string = implode( $delimiter, array_map( 'ucfirst', explode( $delimiter, $string ) ) );
 				}
 			}
+
 			return $string;
 		}
 	}

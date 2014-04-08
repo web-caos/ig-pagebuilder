@@ -1,4 +1,4 @@
-﻿=== IG Page Builder ===
+=== IG Page Builder ===
 Contributors: innogears
 Tags: page builder, admin, content, visual, element, plugin, advanced, page elements, editor, layout, easy to use, page, post, responsive, widget
 Requires at least: 3.6
@@ -12,6 +12,8 @@ A simple yet powerful page builder that lets you create a complete WordPress web
 == Description ==
 
 IG Page Builder is a drag-and-drop page builder that helps you quickly build a complete WordPress website and you don’t even need to read any documentation.
+
+[vimeo https://vimeo.com/88215863]
 
 This page builder is similar to an advanced visual editor, and you can use it for any theme.
 
@@ -54,6 +56,17 @@ You can constantly use this page builder as a starter tool for your website buil
 3. Widget Window
 
 == Changelog ==
+
+= 2.1.0 =
+* Added Custom Css for page feature
+* Added Addons management
+* Improved Move free shortcodes into core
+* Improved Working performance
+* Improved Remove empty value attributes in shortcode tags
+* Improved PageBuilder transformation
+* Improved CSS loading mechanism
+* Fixed minor bugs
+
 = 2.0 =
 * Added Setting page for IG PageBuilder
 * Added Options to handle IG Cache

@@ -1,6 +1,6 @@
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -600,8 +600,10 @@
             if($(window).height() > elmStylePopover.height){
                 $('html, body').animate({scrollTop: offset_.top - 60}, 'fast');
             }
-            $(document).click(function(){
-                box.hide();
+            $(document).click(function(e){
+                if (e.button == 0) {
+                    box.hide();
+                }
             });
 
             if(callback2)
@@ -709,7 +711,14 @@
             }
             $container.find(item).fadeOut(100);
             $container.find(selector).fadeIn();
-
+            
+            if (value == 'shortcode') {
+            	$('#jsn-quicksearch-field').hide(100);
+            }else{
+            	if ($('#jsn-quicksearch-field').css('display') == 'none') {
+            		$('#jsn-quicksearch-field').show(100);
+            	}
+            }
         },
 
         // Filter elements in "Add Element" Box
@@ -732,116 +741,135 @@
 
 
     $(document).ready(function() {
-        // Pagebuilder: get textarea content
+        // IG PageBuilder: get textarea content
         var ig_pg_html = '';
-        // Pagebuilder: check if content has changed
-        var ig_pg_change = 1;
+        // IG PageBuilder: check if content has changed
+        var _change_pagebuilder = 1;
         // Classic Editor: check if content has changed
-        var default_text_change = 1;
+        var _change_editor = 1;
         // Classic Editor: get content of Text tab
         var text_content = $('#ig_editor_tab1 #content').val();
 
         var layout;
 
         // Classic Editor: get content of Text tab
-        $('#ig_editor_tab1 #content').bind('change paste', function(){
-            default_text_change = 1;
+        $('#ig_editor_tab1 #content').bind('input propertychange', function(){
+            _change_editor = 1;
             text_content = $(this).val();
         });
 
-        // switch tab: Classic editor , Pagebuilder
+        // switch tab: Classic editor , IG PageBuilder
         $('#ig_editor_tabs a').click(function (e, init_layout) {
-            init_layout = (init_layout != null) ? init_layout : false;
             e.preventDefault();
-            $(this).tab('show');
             var hash = this.hash;
+            // check if this is first time run
+            init_layout = (init_layout != null) ? init_layout : false;
 
-            // init Pagebuilder
+            $(this).tab('show');
+
+            // init IG PageBuilder
             if(this.hash == '#ig_editor_tab2' && layout == null){
                 layout = new JSNLayoutCustomizer();
                 layout.init($("#form-container .jsn-row-container"));
             }
+            // if it is first time run, don't sync content
             if(init_layout)
                 return;
 
+            // IG PageBuilder is deactivate, stop processing
             if($('#ig_deactivate_pb').val() == "1")
                 return;
 
-            // synchronous content from Classic editor to Pagebuilder
+            // synchronous content from Classic editor to IG PageBuilder
+            // store content of current Tab
             var tab_content = '';
-            var html_active = $("#wp-content-wrap").hasClass('html-active');
             switch (hash) {
 
-                // Switch from Pagebuilder -> Classic Editor
+                // IG PageBuilder -> Classic Editor
                 case '#ig_editor_tab1':
-                    // get content of Pagebuilder and check if it is changed
+                    // check if content of IG PageBuilder is changed
                     var old_ig_pg_html = ig_pg_html;
-                    if(ig_pg_html == ''){
-                        ig_pg_html = $('#form-container textarea').serialize();
-                    }
-                    else if(ig_pg_html != $('#form-container textarea').serialize()){
-                        ig_pg_html = $('#form-container textarea').serialize();
-                    }
-                    if(old_ig_pg_html != $('#form-container textarea').serialize()){
-                        ig_pg_change = 1;
+
+                    // get Raw shortcodes content in IG PageBuilder tab
+                    var ig_pb_textarea_content = $('#form-container textarea').serialize();
+
+                    // update value for ig_pg_html
+                    if(ig_pg_html == '' || ig_pg_html != ig_pb_textarea_content){
+                        ig_pg_html = ig_pb_textarea_content;
                     }
 
-                    if(ig_pg_change){
+                    // check if value is changed
+                    if(old_ig_pg_html != ig_pg_html){
+                        _change_pagebuilder = 1;
+                    }
+
+                    // Check if content of 2 tabs are same
+                    if($("#ig_editor_tab1 #content").val() == tab_content) {
+                        _change_pagebuilder = 0;
+                    }
+
+                    // if changed
+                    if(_change_pagebuilder){
+
+                        // get Nice shortcodes content in IG PageBuilder tab
                         $("#form-container textarea[name^='shortcode_content']").each(function(){
                             tab_content += $(this).val();
                         });
 
-                        if($("#ig_editor_tab1 #content").val() != tab_content){
-                            // disable WP Update button
-                            $('#publishing-action #publish').attr('disabled', true);
-                            // remove placeholder text which was inserted to &lt; and &gt;
-                            tab_content = ig_pb_remove_placeholder(tab_content, 'wrapper_append', '');
+                        // disable WP Update button
+                        $('#publishing-action #publish').attr('disabled', true);
 
-                            $.HandleElement.updateClassicEditor(tab_content, html_active, function(){
-                                // reset global variable
-                                tab_content = '';
-                                ig_pg_change = 0;
+                        // remove placeholder text which was inserted to &lt; and &gt;
+                        tab_content = ig_pb_remove_placeholder(tab_content, 'wrapper_append', '');
 
-                                // update variable for Classic Editor -> Pagebuilder
-                                default_text_change = 0;
-                                text_content = tab_content;
-                                $('#ig-tinymce-change').val('0');
-                            });
-                        }
+                        // update Classic Editor content
+                        $.HandleElement.updateClassicEditor(tab_content, function(){
+
+                            // reset global variable
+                            tab_content = '';
+                            _change_pagebuilder = 0;
+
+                            // reset condition variables
+                            _change_editor = 0;
+                            text_content = tab_content;
+                            $('#ig-tinymce-change').val('0');
+                        });
                     }
+
                     break;
 
-                // Switch from Classic Editor -> Pagebuilder
+                // Classic Editor -> IG PageBuilder
                 case '#ig_editor_tab2':
-                    // if content is empty, try to get again
-                    if ( text_content == '' ) {
-                        if(tinymce.get('content'))
-                            text_content = tinymce.get('content').setContent(tab_content);
-                        else
+
+                    // Check if content of Classic Editor Text / Visual has changed
+                    if(_change_editor || $('#ig-tinymce-change').val() == "1"){
+
+                        // remove Shortcode content which is not wrapped in row & column
+                        $('#form-container #ig-tinymce-change').nextAll( ".jsn-item" ).remove();
+
+                        // if content is empty, try to get again
+                        if( ! _change_editor && tinymce.get('content') ) {
+                            text_content = tinymce.get('content').getContent();
+                        } else {
                             text_content = $('#ig_editor_tab1 #content').val();
-                    }
+                        }
 
-                    // get content of Classic Editor
-                    if(html_active && text_content != null){
+                        // update latest content value
                         tab_content = text_content;
-                        text_content = null;
-                    }
-                    else{
-                        tab_content = $('#ig_editor_tab1 #content').val();
-                        tab_content = tab_content.replace(/^content=/, '');
-                    }
 
-                    if(default_text_change || $('#ig-tinymce-change').val() == "1"){
+                        // update IG PageBuilder content
                         $.HandleElement.updatePageBuilder(tab_content, function(){
-                            // reset Pagebuilder Layout manager
+                            // reset IG PageBuilder Layout manager
                             layout.fnReset(layout,true);
                             layout.moveItemDisable(layout.wrapper);
                         });
-                        // reset global variable
-                        tab_content = '';
-                        default_text_change = 0;
+
+                        // reset condition variables
+                        text_content = tab_content = '';
+                        _change_editor = 0;
                         $('#ig-tinymce-change').val('0');
                     }
+
                     break;
             }
         })

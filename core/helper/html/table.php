@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,7 +11,7 @@
  */
 class IG_Pb_Helper_Html_Table extends IG_Pb_Helper_Html {
 	/**
-	 * generate HTML in Pagebuilder for Table type
+	 * generate HTML in IG PageBuilder for Table type
 	 * @param sub_item_type $element
 	 * @return type
 	 */
@@ -48,7 +48,7 @@ class IG_Pb_Helper_Html_Table extends IG_Pb_Helper_Html {
 			}
 		}
 
-		// Wrap cell to a Table to display in Pagebuilder
+		// Wrap cell to a Table to display in IG PageBuilder
 		$row = 0;
 		$updated_html  = array();
 		$columns_count = array();
@@ -84,7 +84,7 @@ class IG_Pb_Helper_Html_Table extends IG_Pb_Helper_Html {
 		$bottom_row    .= '</tr>';
 		$updated_html[] = $bottom_row;
 
-		$items_html = "<table class='table table-bordered' id='table_content'>" . implode( '', $updated_html ) . '</table>';
+		$items_html = "<table class='table table-bordered igpb-table-exceprt' id='table_content'>" . implode( '', $updated_html ) . '</table>';
 		// end Wrap
 
 		$buttons = '<button class="btn table_action" data-target="table_row">'.__( 'Add Row', IGPBL ).'</button>

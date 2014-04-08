@@ -2,7 +2,7 @@
 
 /**
  * @version    $Id$
- * @package    IG Pagebuilder
+ * @package    IG PageBuilder
  * @author     InnoGears Team <support@www.innogears.com>
  * @copyright  Copyright (C) 2012 www.innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,10 +25,12 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		}
 
 		private function __construct() {
-			add_filter( 'ig_pb_assets_register', array( &$this, 'apply_assets' ) );
+			add_filter( 'ig_register_assets', array( &$this, 'apply_assets' ) );
 			$this->enqueue_admin_style();
 			$this->enqueue_admin_script();
-			add_action( 'ig_pb_assets_localize', array( &$this, 'ig_localize' ) );
+
+			// Localize script
+			$this->ig_localize();
 		}
 
 		public function apply_assets( $assets ){
@@ -47,6 +49,18 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 				'src' => IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/css/modal.css',
 				'ver' => '1.0.0',
 			);
+			$assets['ig-pb-codemirror-css'] = array(
+				'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/' ) . '/codemirror/codemirror.css',
+				'ver' => '1.0.0',
+			);
+			$assets['ig-pb-codemirror-js'] = array(
+				'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/' ) . '/codemirror/codemirror.js',
+				'ver' => '1.0.0',
+			);
+			$assets['ig-pb-codemirrormode-css-js'] = array(
+				'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/' ) . '/codemirror/mode/css.js',
+				'ver' => '1.0.0',
+			);
 
 			$assets = apply_filters( 'ig_pb_assets_register_modal', $assets );
 
@@ -54,25 +68,25 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		}
 
 		public function enqueue_admin_script() {
-			IG_Pb_Helper_Functions::enqueue_scripts();
+			IG_Pb_Helper_Functions::enqueue_scripts_modal();
 
 			wp_enqueue_media();
 
 			IG_Pb_Helper_Functions::enqueue_scripts_end();
 
-			IG_Pb_Assets_Load::load( array( 'ig-pb-jquery-fancybox-js', 'ig-pb-placeholder' ) );
+			IG_Init_Assets::load( array( 'ig-pb-jquery-fancybox-js', 'ig-pb-placeholder' ) );
 		}
 
 		public function enqueue_admin_style() {
 			IG_Pb_Helper_Functions::enqueue_styles();
-			IG_Pb_Assets_Load::load( array( 'ig-pb-jquery-tipsy-css', 'ig-pb-modal-css', 'ig-pb-jquery-fancybox-css' ) );
+			IG_Init_Assets::load( array( 'ig-pb-jquery-tipsy-css', 'ig-pb-modal-css', 'ig-pb-jquery-fancybox-css' ) );
 			if ( IG_Pb_Helper_Functions::is_preview() ) {
-				IG_Pb_Assets_Load::load( array( 'ig-pb-frontend-css' ) );
+				IG_Init_Assets::load( array( 'ig-pb-frontend-css' ) );
 			}
 		}
 
-		public function ig_localize( $load ) {
-			wp_localize_script( 'ig-pb-handlesetting-js', 'Ig_Ajax', IG_Pb_Helper_Functions::localize_js() );
+		public function ig_localize() {
+			IG_Init_Assets::localize( 'ig-pb-handlesetting-js', 'Ig_Ajax', IG_Pb_Helper_Functions::localize_js() );
 		}
 
 		public function preview_modal( $page = '' ) {
@@ -84,15 +98,28 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 
 			// load last assets: HandleSettings & hooked assets
 			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-handlesetting-js', ) );
-			IG_Pb_Assets_Load::load( $assets );
+			IG_Init_Assets::load( $assets );
 		}
 
+		/**
+         * Content for Layout Modal
+         */
 		public function content_layout() {
+
 			include IG_PB_TPL_PATH . '/layout/list.php';
 
 			// load last assets: HandleSettings & hooked assets
-			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-handlesetting-js', ) );
-			IG_Pb_Assets_Load::load( $assets );
+			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-handlesetting-js' ) );
+			IG_Init_Assets::load( $assets );
+		}
+
+		/**
+         * Content for Custom css Modal
+         */
+		public function content_custom_css() {
+			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-codemirror-css', 'ig-pb-codemirror-js', 'ig-pb-codemirrormode-css-js' ) );
+			IG_Init_Assets::load( $assets );
+			include IG_PB_TPL_PATH . '/custom-css.php';
 		}
 
 		/**
@@ -132,9 +159,10 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		 * @param type $options
 		 * @return type
 		 */
-		static function get_shortcode_modal_settings( $settings, $shortcode = '', $input_params = null ) {
+		static function get_shortcode_modal_settings( $settings, $shortcode = '', $input_params = null, $raw_shortcode = null ) {
 			$i    = 0;
 			$tabs = $contents = $actions = $general_actions = array();
+
 			foreach ( $settings as $tab => $options ) {
 				$options = self::ignore_settings( $options );
 				if ( $tab == 'action' ) {
@@ -201,9 +229,14 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 					}
 
 					$param_html  = implode( '', $param_html );
-					$content_tab = "<div class='tab-pane $active' id='$tab'>$param_html</div>";
+					$content_tab = "<div class='tab-pane $active ig-pb-setting-tab' id='$tab'>$param_html</div>";
 					$contents[]  = $content_tab;
 				}
+			}
+
+			// Auto-append `Shortcode Content` tab
+			if ( $shortcode != 'ig_row' ) {
+				self::shortcode_content_tab( $tabs, $contents, $raw_shortcode );
 			}
 
 			return self::setting_tab_html( $shortcode, $tabs, $contents, $general_actions, $settings, $actions );
@@ -244,6 +277,56 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 			return $output;
 		}
 
-	}
+		/**
+		 * Append shortcode content tab to all element settings modal.
+		 *
+		 * @param   array   &$tabs          Current tabs array.
+		 * @param   array   &$contents      Currnt content array.
+		 * @param   string  $raw_shortcode  Raw shortcode content.
+		 *
+		 * @return  void
+		 */
+		public static function shortcode_content_tab( &$tabs, &$contents, $raw_shortcode ) {
+			// Auto-append `Shortcode Content` tab only if this is not a sub-modal
+			if ( ! isset( $_REQUEST['submodal'] ) || ! $_REQUEST['submodal'] ) {
+				// Generate tab for shortcode content
+				$tabs[] = '<li><a href="#shortcode-content" data-toggle="tab">' . __( 'Shortcode', IGPBL ) . '</a></li>';
 
+				// Generate content for shortcode content tab
+				$contents[] = '<div class="tab-pane clearfix" id="shortcode-content">'
+				. '<textarea id="shortcode_content" class="jsn-input-xxlarge-fluid" disabled="disabled">' . esc_textarea( $raw_shortcode ) . '</textarea>'
+				. '<div class="text-center"><button class="btn btn-success" id="copy_to_clipboard">' . __( 'Copy to Clipboard', IGPBL ) . '</button></div>'
+				. '</div>';
+
+				// Load ZeroClipboard JavaScript library for Shortcode Content tab
+				IG_Init_Assets::load( 'ig-zeroclipboard-js' );
+
+				$script = '
+		$(window).load(function() {
+			var textarea = $("#shortcode_content"), button = $("#copy_to_clipboard");
+
+			ZeroClipboard.config({ moviePath: "' . IG_PB_URI . '/assets/3rd-party/zeroclipboard/ZeroClipboard.swf" });
+			var client = new ZeroClipboard(button);
+			client.on("datarequested", function() {
+				// Copy shortcode content to clipboard
+				client.setText(textarea.val());
+
+				// Show message
+				button.addClass("disabled").attr("disabled", "disabled").html("' . __( 'Copy to clipboard', IGPBL ) . '<i class=\"icon-checkmark\"></i>");
+
+				// Schedule hiding the message
+				setTimeout(function() {
+					button.removeClass("disabled").removeAttr("disabled");
+					$("i", button).animate({"opacity": "0"}, 500, function (){$(this).hide()});
+				}, 1000);
+			});
+		});';
+
+				IG_Init_Assets::inline( 'js', $script );
+			} else {
+				// Generate hidden text area to hold raw shortcode
+				$contents[] = '<textarea class="hidden" id="shortcode_content">' . esc_textarea( $raw_shortcode ) . '</textarea>';
+			}
+		}
+	}
 }

@@ -1,0 +1,9 @@
+
+/* Progress Bar */
+.jsn-bootstrap .progress-info > span {
+	margin-bottom: 5px;
+	display: inline-block;
+}
+.jsn-bootstrap .progress-info .progress-percentage {
+	margin-left: 10px;
+}
