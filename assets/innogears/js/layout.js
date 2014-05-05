@@ -909,7 +909,7 @@
                     }
 
 					// Synchronize content of classic editor with IG PageBuilder
-                    var text_content_ = window.tinymce ? tinymce.get('content').getContent() : $('#ig_editor_tab1 #content').val();
+                    var text_content_ = window.tinymce && tinymce.get('content') ? tinymce.get('content').getContent() : $('#ig_editor_tab1 #content').val();
 
                     if (tab_content != text_content_) {
                         _change_editor = 1;
