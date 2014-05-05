@@ -9,51 +9,61 @@
  * Websites: http://www.www.innogears.com
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
+
+/**
+ * @todo : Ig PageBuilder Meta box content
+ */
+
 wp_nonce_field( 'ig_builder', IGNONCE . '_builder' );
 ?>
 <!-- Buttons bar -->
 <div class="jsn-form-bar">
 	<div id="status-switcher" class="btn-group" data-toggle="buttons-radio">
-		<button type="button" class="switchmode-button btn active" id="status-on" data-title="<?php _e( 'Active Page Builder', IGPBL ) ?>"><?php _e( 'On', IGPBL ) ?></button>
-		<button type="button" class="switchmode-button btn" id="status-off" data-title="<?php _e( 'Deactivate Page Builder', IGPBL ) ?>"><?php _e( 'Off', IGPBL ) ?></button>
+		<button type="button" class="switchmode-button btn btn-default active" id="status-on" data-title="<?php _e( 'Active Page Builder', IGPBL ) ?>"><?php _e( 'On', IGPBL ) ?></button>
+		<button type="button" class="switchmode-button btn btn-default" id="status-off" data-title="<?php _e( 'Deactivate Page Builder', IGPBL ) ?>"><?php _e( 'Off', IGPBL ) ?></button>
 	</div>
 	<div id="mode-switcher" class="btn-group" data-toggle="buttons-radio">
-		<button type="button" class="switchmode-button btn active" id="switchmode-compact"><?php _e( 'Compact', IGPBL ) ?></button>
-		<button type="button" class="switchmode-button btn" id="switchmode-full"><?php _e( 'Full', IGPBL ) ?></button>
+		<button type="button" class="switchmode-button btn btn-default active" id="switchmode-compact"><?php _e( 'Compact', IGPBL ) ?></button>
+		<button type="button" class="switchmode-button btn btn-default" id="switchmode-full"><?php _e( 'Full', IGPBL ) ?></button>
 	</div>
 
 	<!-- Page Templates -->
     <div class="pull-right" id="top-btn-actions">
         <div class="pull-left" id="page-custom-css">
-            <button class="btn" onclick="return false;"><?php _e( 'Add custom CSS', IGPBL ) ?></button>
+            <button class="btn btn-default" onclick="return false;"><?php _e( 'Custom CSS', IGPBL ) ?></button>
         </div>
-    	<div class="btn-group pull-left" id="page-template">
-    		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+    	<div class="btn-group dropdown" id="page-template">
+    		<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
 			<?php _e( 'Page template', IGPBL ) ?>
 			<span class="caret"></span>
 			</a>
 			<ul class="dropdown-menu pull-right">
-		    	<li><a href="#" id="save-as-new"><?php _e( 'Save as new template', IGPBL ); ?></a></li>
+		    	<li><a href="#" id="save-as-new" data-toggle="modal"><?php _e( 'Save as new template', IGPBL ); ?></a></li>
 		    	<li><a  id="apply-page" href="#"><?php _e( 'Load template', IGPBL ); ?></a></li>
-		    </ul>			
+		    </ul>
 	    </div>
     </div>
+
     <!-- Save as new template modal -->
-    <div id="save-as-new-dialog" class="modal" >
-    	<div class="modal-header ui-dialog-title">
-		<h3><?php _e( 'Save as new template', IGPBL ); ?></h3>
-		</div>
-    	<div class="modal-body">
-	    	<div >
-				<label class="control-label" for="template-name"><?php _e( 'Template name:' );?></label>
-				<div class="controls">
-					<input type="text" id="template-name" class="input">	
+    <div id="save-as-new-dialog" role="dialog" aria-hidden="true" tabindex="-1" >
+     	<div class="modal-dialog">
+	     	<div class="modal-content">
+		    	<div class="modal-header ui-dialog-title">
+				<h3><?php _e( 'Save as new template', IGPBL ); ?></h3>
 				</div>
-	    	</div>
-    	</div>
-    	<div class="modal-footer">
-			<a href="#" class="btn btn-primary template-save"><?php _e( 'Save', IGPBL ); ?></a>
-			<a href="#" class="btn template-cancel"><?php _e( 'Cancel', IGPBL ); ?></a>
+		    	<div class="modal-body form-horizontal">
+			    	<div class="form-group">
+						<label class="col-xs-3 control-label" for="template-name"><?php _e( 'Template name:' );?></label>
+						<div class="controls col-xs-9">
+							<input type="text" id="template-name" class="input form-control">
+						</div>
+			    	</div>
+		    	</div>
+		    	<div class="modal-footer">
+					<a href="#" class="btn btn-primary template-save"><?php _e( 'Save', IGPBL ); ?></a>
+					<a href="#" class="btn template-cancel"><?php _e( 'Cancel', IGPBL ); ?></a>
+				</div>
+			</div>
 		</div>
     </div>
     <!-- END Save as new template modal -->
@@ -62,7 +72,7 @@ wp_nonce_field( 'ig_builder', IGNONCE . '_builder' );
 <!-- IG PageBuilder elements -->
 <div class="jsn-section-content jsn-style-light" id="form-design-content">
 	<div id="ig-pbd-loading" class="text-center"><i class="jsn-icon32 jsn-icon-loading"></i></div>
-	<div id="form-container" class="jsn-layout">
+	<div class="ig-pb-form-container jsn-layout">
 <?php
 global $post;
 $pagebuilder_content = get_post_meta( $post->ID, '_ig_page_builder_content', true );
@@ -83,11 +93,12 @@ if ( ! empty( $pagebuilder_content ) ) {
 		</p>
 		<p class="jsn-bglabel">
 			<a href="javascript:void(0)" class="btn btn-success" id="status-on-link"><?php _e( 'Turn PageBuilder on', IGPBL )?></a>
-		</p>	
-		
+		</p>
+
 	</div>
 </div>
 
+<!-- Link to website -->
 <div id="branding">
 	<div class="pull-left">
 		<a href="http://www.innogears.com/wordpress-plugins/ig-pagebuilder-on-wporg.html"><?php _e( 'PageBuilder', IGPBL ); ?></a> <?php _e( 'by', IGPBL )?> <a href="http://www.innogears.com" target="_blank">InnoGears.com</a>
@@ -99,10 +110,15 @@ if ( ! empty( $pagebuilder_content ) ) {
 	</div>
 	<div class="clearbreak"></div>
 </div>
+
 <?php
+// Select Element Popover
 include 'select-elements.php';
+
+// Page Template
 include 'layout/template.php';
 
+// Insert Post ID as hidden field
 global $post;
 ?>
 <div id="ig-pb-css-value">

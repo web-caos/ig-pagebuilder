@@ -10,7 +10,15 @@
  */
 
 class IG_Pb_Utils_Common {
-	// Delete meta keys
+
+	/**
+     * Delete meta keys
+     *
+     * @global type $wpdb
+     * @param type $keys
+     * @param type $post_id
+     * @return type
+     */
 	static function delete_meta_key( $keys, $post_id = null ) {
 		if ( empty ( $keys ) || ! count( $keys ) ) {
 			return false;
@@ -21,7 +29,11 @@ class IG_Pb_Utils_Common {
 		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE $extra meta_key IN (%s)", $keys ) );
 	}
 
-	// Remove cache folder
+	/**
+     * Remove cache folder
+     * 
+     * @return type
+     */
 	static function remove_cache_folder() {
 		$cache_dir = WP_CONTENT_DIR . '/uploads' . '/igcache/pagebuilder';
 		IG_Pb_Utils_Common::recursive_delete( $cache_dir );

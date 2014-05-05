@@ -28,7 +28,7 @@ class IG_Pb_Shortcode_Layout extends IG_Pb_Shortcode_Common {
 
 		// enqueue custom script for current element
 		if ( IG_Pb_Helper_Functions::is_modal_of_element( $this->config['shortcode'] ) ) {
-			IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_js', '' );
+			IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'admin_assets', '' );
 		}
 	}
 

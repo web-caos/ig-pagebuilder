@@ -11,21 +11,21 @@
 
 
 /**
- * Root wrapper div #form-container, contains all content
+ * Root wrapper div .ig-pb-form-container, contains all content
  * Columns are seperated by a 12px seperators
- * HTML structure: #form-container [.jsn-row-container [.jsn-column-container]+]+
+ * HTML structure: .ig-pb-form-container [.jsn-row-container [.jsn-column-container]+]+
  *
  */
 
 (function ($) {
-    function JSNLayoutCustomizer() {
-
-    }
+    // Add flag for tracking event switching to pagebuilder tab
+    var is_pagebuilder_tab = false;
+    function JSNLayoutCustomizer() { }
 
     JSNLayoutCustomizer.prototype = {
         init:function (_this) {
             // Get necessary elements
-            this.wrapper = $("#form-container");
+            this.wrapper = $(".ig-pb-form-container.jsn-layout");
             this.wrapper_width = 0;
             this.columns = $(_this).find('.jsn-column-container');
             this.addcolumns = '.add-container';
@@ -37,31 +37,14 @@
             this.effect = 'easeOutCubic';
 
             // Initialize variables
-            this.maxWidth = $('#form-container').width();
-            // do this to prevent columns drop
-            $('#form-container').css('width', this.maxWidth + 'px');
+            this.maxWidth = $('.ig-pb-form-container.jsn-layout').width();
+
+            // Do this to prevent columns drop
+            $('.ig-pb-form-container.jsn-layout').css('width', this.maxWidth + 'px');
             this.spacing = 12;
-            var self	= this;
+            var self    = this;
 
-            // Sortable for columns in row
-            $(_this).find(".ig-row-content").livequery(function(){
-                $(this).sortable({
-                    axis:'x',
-                    //   placeholder:'ui-state-highlight',
-                    start:$.proxy(function (event, ui) {
-                        ui.placeholder.append(ui.item.children().clone());
-                        $(ui.item).parents(".ig-row-content").find(".ui-resizable-handle").hide();
-                    }, this),
-                    handle:".jsn-handle-drag",
-                    stop:$.proxy(function (event, ui) {
-                        $(ui.item).parents(".ig-row-content").find(".ui-resizable-handle").show();
-                        self.wrapper.trigger('ig-pagebuilder-layout-changed', [ui.item]);
-                    }, this)
-                });
-            });
-            $(_this).find(".ig-row-content").disableSelection();
-
-            // has not inited before, so call all functions
+            // Has not inited before, so call all functions
             this.addRow(this, this.wrapper);
             this.updateSpanWidthPBDL(this, this.wrapper, this.maxWidth);
             this.initResizable(-1);
@@ -70,12 +53,45 @@
             this.moveItem();
             this.moveItemDisable(this.wrapper);
             this.resizeHandle(this);
-            this.sortableElement();
             this.addElement();
             this.showAddLayoutBox();
             this.showSaveLayoutBox();
             this.searchElement();
+            this.rebuildSortable();
+            this.closeFilterElementOnPopover();
+        },
 
+        // Make click outside to close the dropdown on popover.
+        closeFilterElementOnPopover: function() {
+            $('.popover').on("click", function(e) {
+                var el = $(e.target);
+                if (el.parents("#s2id_jsn_filter_element").length == 0) {
+                    $("#jsn_filter_element").select2("close");
+                }
+            });
+        },
+
+        // Update sortable event for row and column layout
+        rebuildSortable:function () {
+            // Sortable for columns in row
+            var self    = this;
+            $(".ig-row-content").sortable({
+                axis:'x',
+                //   placeholder:'ui-state-highlight',
+                start:$.proxy(function (event, ui) {
+                    ui.placeholder.append(ui.item.children().clone());
+                    $(ui.item).parents(".ig-row-content").find(".ui-resizable-handle").hide();
+                }, this),
+                handle:".jsn-handle-drag",
+                stop:$.proxy(function (event, ui) {
+                    $(ui.item).parents(".ig-row-content").find(".ui-resizable-handle").show();
+                    self.wrapper.trigger('ig-pagebuilder-layout-changed', [ui.item]);
+                }, this)
+            });
+            $(".ig-row-content").disableSelection();
+
+            // Sortable for columns
+            this.sortableElement();
         },
 
         // Update column width when window resize
@@ -84,7 +100,7 @@
                 if($('body').children('.ui-dialog').length)
                     $('html, body').animate({scrollTop: $('body').children('.ui-dialog').first().offset().top - 60}, 'fast');
                 self.fnReset(self);
-                var _rows	= $('.jsn-row-container', self.wrapper);
+                var _rows   = $('.jsn-row-container', self.wrapper);
                 self.wrapper.trigger('ig-pagebuilder-column-size-changed', [_rows]);
             });
             $("#ig_page_builder").resize(function() {
@@ -92,16 +108,29 @@
             });
         },
 
-        // reset when resize window/pagebuilder
+        // Reset when resize window/pagebuilder
         fnReset:function(self, trigger){
             if((self.resize || trigger) && $("#form-design-content").width()){
-                // do this to prevent columns drop
-                $("#form-container").width($("#form-design-content").width() + 'px');
-                self.maxWidth = $("#form-container").width();
-                // re-calculate step width
+                // Do this to prevent columns drop
+                $(".ig-pb-form-container.jsn-layout").width($("#form-design-content").width() + 'px');
+                self.maxWidth = $(".ig-pb-form-container.jsn-layout").width();
+
+                // Re-calculate step width
                 self.calStepWidth(0, 'reset');
                 self.initResizable(-1, false);
                 self.updateSpanWidthPBDL(self, self.wrapper, self.maxWidth);
+
+                if ( is_pagebuilder_tab == true ) {
+                    // Set 500 miliseconds when switching to pagebuilder tab.
+                    var timerId = setTimeout(function () {
+                        // Close indicator loading in pagebuiler wrapper
+                        $("#ig-pbd-loading").hide();
+                        $(".ig-pb-form-container.jsn-layout").show();
+
+                        is_pagebuilder_tab = false;
+                        clearTimeout(timerId);
+                    }, 500);
+                }
             }
         },
 
@@ -109,7 +138,7 @@
         calStepWidth:function(countColumn, reset){
             var this_column = this.columns;
             if(reset != null){
-                this_column = $("#form-container").find(".jsn-row-container").first().find('.jsn-column-container');
+                this_column = $(".ig-pb-form-container.jsn-layout").find(".jsn-row-container").first().find('.jsn-column-container');
             }
 
             var formRowLength = (countColumn > 0) ? countColumn : this_column.length;
@@ -146,14 +175,16 @@
                 var next_span = parseInt(nextWidth / step);
                 thisWidth = parseInt(parseInt(this_span)*bothWidth/(this_span + next_span));
                 nextWidth = parseInt(parseInt(next_span)*bothWidth/(this_span + next_span));
+
                 // Snap column to grid
                 ui.element.css('width', thisWidth + 'px');
+
                 // Resize next sibling element as well
                 ui.element[0].__next.css('width', nextWidth + 'px');
-                // show % width
 
+                // Show % width
                 self.percentColumn($(ui.element),"add",step);
-                var _row	= $(ui.element).parents('.jsn-row-container');
+                var _row    = $(ui.element).parents('.jsn-row-container');
                 self.wrapper.trigger('ig-pagebuilder-column-size-changed', [_row]);
             }, this);
             // Reset resizable column
@@ -167,7 +198,8 @@
                         ui.element[0].__next = ui.element[0].__next || ui.element.parent().next().children();
                         ui.element[0].__next[0].originalWidth = ui.element[0].__next.width();
                         ui.element.resizable('option', 'maxWidth', '');
-                        // disable resize handle
+
+                        // Disable resize handle
                         self.resize = 0;
                     }, this),
                     resize:handleResize,
@@ -189,16 +221,17 @@
                                 "height":"auto"
                             });
                         }
-                        // enable resize handle
+
+                        // Enable resize handle
                         self.resize = 1;
-                        /// self.updateSpanWidthPBDL(self, self.wrapper, $("#form-container").width());
+                        /// self.updateSpanWidthPBDL(self, self.wrapper, $(".ig-pb-form-container").width());
 
                         self.percentColumn($(ui.element),"remove",step);
                     }, this)
                 });
             }, this));
 
-            // remove duplicated resizable-handle div
+            // Remove duplicated resizable-handle div
             if(countColumn > 0){
                 $(".jsn-column").each(function(){
                     if($(this).find('.ui-resizable-handle').length > 1)
@@ -218,15 +251,16 @@
             if (action == "add") {
 
                 var this_parent = $(element).parents(".jsn-column-container");
-                // get current columnm & next column
+                // Get current columnm & next column
                 var cols = [this_parent.find('.jsn-column'), this_parent.next('.jsn-column-container').find('.jsn-column')];
-                // count total span of this column & next column
+
+                // Count total span of this column & next column
                 var spans = 0;
                 $.each(cols, function () {
                     spans += parseInt(self.getSpan(this));
                 })
 
-                // show percent tooltip of this column & the next column
+                // Show percent tooltip of this column & the next column
                 var updated_spans = [];
                 $.each(cols, function (i) {
                     var thisCol = this;
@@ -239,7 +273,7 @@
                     self.showPercentColumn(thisCol, thisSpan);
                 });
 
-                // show percent tooltip of other columns
+                // Show percent tooltip of other columns
                 $(element).parents(".jsn-row-container").find(".jsn-column").each(function(){
                     if(!$(this).find(".ig-pb-layout-percent-column").length){
                         var thisCol = this;
@@ -282,29 +316,30 @@
         addRow:function(self, this_wrapper){
             this.wrapper.delegate('#jsn-add-container',"click",function(e) {
                     e.preventDefault();
-                    if($("#form-container").find('.jsn-row-container').last().is(':animated')) return;
-                    // animation
+                    if($(".ig-pb-form-container.jsn-layout").find('.jsn-row-container').last().is(':animated')) return;
+
+                    // Animation
                     $(this).before(ig_pb_remove_placeholder($("#tmpl-ig_row").html(), 'custom_style', 'style="display:none"'));
-                    var new_el = $("#form-container").find('.jsn-row-container').last();
+                    var new_el = $(".ig-pb-form-container.jsn-layout").find('.jsn-row-container').last();
                     var height_ = new_el.height();
-                    new_el.css({'opacity' : 0, 'height' : 0});
+                    new_el.css({'opacity' : 0, 'height' : 0, 'display' : 'block'});
                     new_el.addClass('overflow_hidden');
                     new_el.show();
                     new_el.animate({height: height_},300,self.effect, function(){
-                        new_el.removeClass('overflow_hidden');
                         $(this).animate({opacity:1},300,self.effect,function(){
-                            new_el.css('height','auto');
+                            new_el.removeClass('overflow_hidden');
                         });
                     });
                     //last_row.fadeIn(1000);
 
-                    // update width for colum of this new row
+                    // Update width for colum of this new row
                     var parentForm = self.wrapper.find(".jsn-row-container").last();
                     self.updateSpanWidth(1, self.maxWidth, parentForm);
-                    // enable/disable move icons
-                    self.moveItemDisable(this_wrapper);
 
-                    self.updateSpanWidthPBDL(self, self.wrapper, $("#form-container").width());
+                    // Enable/disable move icons
+                    self.moveItemDisable(this_wrapper);
+                    self.rebuildSortable();
+                    self.updateSpanWidthPBDL(self, self.wrapper, $(".ig-pb-form-container.jsn-layout").width());
                 });
         },
 
@@ -356,7 +391,7 @@
                     self.wrapContentRow(parent, otherRow, direction);
                     // Set trigger timeout to be sure it happens after animation
                     setTimeout(function (){
-                    	self.wrapper.trigger('ig-pagebuilder-layout-changed', [parent]);
+                        self.wrapper.trigger('ig-pagebuilder-layout-changed', [parent]);
                     }, 1001);
 
                 }
@@ -365,12 +400,13 @@
 
         // Disable Move Row Up, Down Icons
         moveItemDisable:function(this_wrapper){
-        	var self	= this;
+            var self    = this;
             this_wrapper.find(this.moveItemEl).each(function(){
                 var class_ = $(this).attr("class");
                 var parent = $(this).parents(".jsn-row-container");
                 var parent_idx = parent.index(".jsn-row-container");
-                // add "disabled" class
+
+                // Add "disabled" class
                 if(class_.indexOf("jsn-move-up") >= 0){
                     if(parent_idx == 0)
                         $(this).addClass("disabled");
@@ -406,7 +442,7 @@
                     $(this).find('.jsn-column').css('width', Math.ceil(parseInt(selfSpan)*remainWidth/12) + 'px');
                 else
                     $(this).find('.jsn-column').css('width', Math.floor(parseInt(selfSpan)*remainWidth/12) + 'px');
-            })
+            });
         },
 
         // Add Column
@@ -419,70 +455,28 @@
                     countColumn += 1;
                     var span = parseInt(12 / countColumn);
                     var exclude_span = (12 % countColumn != 0)? span + (12 % countColumn) : span;
-                    // update span old columns
+
+                    // Update span old columns
                     parentForm.find(".jsn-column-container").each(function () {
                         $(this).attr('class', $(this).attr('class').replace(/span[0-9]{1,2}/g, 'span'+span));
                         $(this).html($(this).html().replace(/span[0-9]{1,2}/g, 'span'+span));
                     });
 
-                    // update span new column
+                    // Update span new column
                     column_html = column_html.replace(/span[0-9]{1,2}/g, 'span'+exclude_span);
 
-                    // add new column
+                    // Add new column
                     parentForm.find(".ig-row-content").append(column_html);
 
-                    // update width for all columns
+                    // Update width for all columns
                     self.updateSpanWidth(countColumn, self.maxWidth, parentForm);
                 }
-                // actiave resizable for columns
+
+                // Actiave resizable for columns
                 self.initResizable(countColumn);
+                self.rebuildSortable();
                 self.wrapper.trigger('ig-pagebuilder-layout-changed', [parentForm]);
             });
-        },
-
-        // Confirm message when delete item
-        removeConfirmMsg:function(item, type, column_to_row, callback){
-            var self = this;
-            var msg = "";
-            var show_confirm = 1;
-            switch(type){
-                case 'row':
-                    if(item.find('.jsn-column-content').find('.shortcode-container').length == 0)
-                        show_confirm = 0;
-                    msg = Ig_Translate.delete_row;
-                    break;
-                case 'column':
-                    var check_item = (column_to_row != null) ? column_to_row : item;
-                    if(check_item.find('.shortcode-container').length == 0)
-                        show_confirm = 0;
-                    msg = Ig_Translate.delete_column;
-                    break;
-                default:
-                    msg = Ig_Translate.delete_element;
-            }
-
-            var confirm_ = show_confirm ? confirm(msg) : true;
-            if(confirm_){
-                if(type == 'row'){
-                    item.animate({opacity:0},300,self.effect,function(){
-                        item.animate({height:0},300,self.effect,function(){
-                            item.remove();
-                            self.moveItemDisable(self.wrapper);
-                        });
-                    });
-                }
-                else if(type == 'column'){
-                    item.animate({height:0},500,self.effect,function(){
-                        item.remove();
-                        if(callback != null) callback();
-                    });
-                }
-                else
-                    item.remove();
-                return true;
-            }
-            else
-                return false;
         },
 
         // Remove Row/Column/Element Handle
@@ -491,7 +485,7 @@
             var this_wrapper = this.wrapper;
             this.wrapper.delegate(this.deletebtn,"click",function(){
                 if($(this).hasClass('row')){
-                    self.removeConfirmMsg($(this).parents(".jsn-row-container"), 'row');
+                    $.HandleCommon.removeConfirmMsg($(this).parents(".jsn-row-container"), 'row');
                     self.wrapper.trigger('ig-pagebuilder-layout-changed', [parentForm]);
                 }
                 else if($(this).hasClass('column')){
@@ -500,36 +494,36 @@
                     var countColumn = parentForm.find(".jsn-column-container").length;
                     countColumn -= 1;
                     if(countColumn == 0){
-                        // remove this row
-                        self.removeConfirmMsg(parentForm, 'column', $(this).parents(".jsn-column-container"));
+                        // Remove this row
+                        $.HandleCommon.removeConfirmMsg(parentForm, 'column', $(this).parents(".jsn-column-container"));
                         self.wrapper.trigger('ig-pagebuilder-layout-changed', [parentForm]);
                         return true;
                     }
                     var span = parseInt(12 / countColumn);
                     var exclude_span = (12 % countColumn != 0)? span + (12 % countColumn) : span;
 
-                    // remove current column
-                    if(!self.removeConfirmMsg($(this).parents(".jsn-column-container"), 'column', null, function(){
-                        // update span remain columns
+                    // Remove current column
+                    if(!$.HandleCommon.removeConfirmMsg($(this).parents(".jsn-column-container"), 'column', null, function(){
+                        // Update span remain columns
                         parentForm.find(".jsn-column-container").each(function () {
                             $(this).attr('class', $(this).attr('class').replace(/span[0-9]{1,2}/g, 'span'+span));
                             $(this).html($(this).html().replace(/span[0-9]{1,2}/g, 'span'+span));
                         });
 
-                        // update span last column
+                        // Update span last column
                         parentForm.find(".jsn-column-container").last().html(parentForm.find(".jsn-column-container").last().html().replace(/span[0-9]{1,2}/g, 'span'+exclude_span));
 
-                        // update width for all columns
+                        // Update width for all columns
                         self.updateSpanWidth(countColumn, totalWidth, parentForm);
-                        // actiave resizable for columns
+
+                        // Actiave resizable for columns
                         self.initResizable(countColumn);
+                        self.rebuildSortable();
                         self.wrapper.trigger('ig-pagebuilder-layout-changed', [parentForm]);
                     }))
                         return false;
                 }
-
-                self.updateSpanWidthPBDL(self, self.wrapper, $("#form-container").width());
-
+                self.updateSpanWidthPBDL(self, self.wrapper, $(".ig-pb-form-container.jsn-layout").width());
             });
         },
 
@@ -560,20 +554,18 @@
 
         // Sortable Element
         sortableElement:function(){
-        	var self	= this;
-            $(".jsn-element-container").livequery(function(){
-                $(this).sortable({
-                    connectWith: ".jsn-element-container",
-                    placeholder: "ui-state-highlight",
-                    stop: function (e, ui){
-                    	self.wrapper.trigger('ig-pagebuilder-layout-changed', [ui.item]);
-                    }
-                })
-            })
+            var self    = this;
+            $(".jsn-element-container").sortable({
+                connectWith: ".jsn-element-container",
+                placeholder: "ui-state-highlight",
+                stop: function (e, ui){
+                    self.wrapper.trigger('ig-pagebuilder-layout-changed', [ui.item]);
+                }
+            });
             $(".jsn-element-container").disableSelection();
         },
 
-        // show popover box
+        // Show popover box
         showPopover:function(box, e, self, this_, callback1, callback2){
             $(document).trigger('click');
             if(box.is(':animated')) return;
@@ -584,16 +576,17 @@
             if(callback1)
                 callback1();
 
-            // show popover
+            // Show popover
             var elmStylePopover = self.getBoxStyle(box.find(".popover")),
             parentStyle = self.getBoxStyle(this_),
             offset_ = {};
             offset_.left = parentStyle.offset.left - elmStylePopover.outerWidth / 2 + parentStyle.outerWidth / 2;
             offset_.top = parentStyle.offset.top - elmStylePopover.height;
-            // check if is first row or not
-            var row_idx= $("#form-container .jsn-row-container").index(this_.parents('.jsn-row-container'));
+
+            // Check if is first row or not
+            var row_idx= $(".ig-pb-form-container.jsn-layout .jsn-row-container").index(this_.parents('.jsn-row-container'));
             var element_in_col= this_.parent('.jsn-column-content').find('.jsn-element').length;
-            offset_.top = (row_idx == 0 && element_in_col < 3) ? (offset_.top + 40) : offset_.top;
+            offset_.top = (row_idx == 0 && element_in_col < 3) ? (offset_.top + 30) : offset_.top;
             box.offset(offset_).click(function (e) {
                 e.stopPropagation();
             });
@@ -616,24 +609,24 @@
             var box = $("#ig-add-element");
             this.wrapper.delegate(this.addelements,"click",function(e){
                 self.showPopover(box, e, self, $(this), function(){
-                    // filter
+                    // Filter
                     var filter_select = box.find("select.jsn-filter-button");
                     filter_select.select2({
-                        minimumResultsForSearch:99
+                        minimumResultsForSearch:-1
                     });
 
                     if($("#jsn-quicksearch-field").val() != ''){
                         $("#reset-search-btn").trigger("click");
                     }
                     else
-                        self.elementFilter(filter_select.val(), 'data-type');
+                        self.elementFilter(filter_select.val(), 'data-sort');
 
                     $("#jsn-quicksearch-field").focus();
 
                 }, function(){
-                    // trigger this (call 2 times)
-                    self.updateSpanWidthPBDL(self, self.wrapper, $("#form-container").width());
-                    self.updateSpanWidthPBDL(self, self.wrapper, $("#form-container").width());
+                    // Trigger this (call 2 times)
+                    self.updateSpanWidthPBDL(self, self.wrapper, $(".ig-pb-form-container.jsn-layout").width());
+                    self.updateSpanWidthPBDL(self, self.wrapper, $(".ig-pb-form-container.jsn-layout").width());
                 });
             })
         },
@@ -645,7 +638,8 @@
             $('#premade-layout').click(function(e){
                 self.showPopover(box, e, self, $(this));
             });
-            // toggle Save/Upload layout form
+
+            // Toggle Save/Upload layout form
             $('.layout-action').click(function(e){
                 $(this).toggleClass('hidden');
                 $(this).next('.layout-toggle-form').toggleClass('hidden');
@@ -689,7 +683,7 @@
             }, 500);
             $('#ig-add-element .jsn-filter-button').change(function() {
                 ///self.filterElement($(this).val(), 'type');
-                self.elementFilter($(this).val(), 'data-type');
+                self.elementFilter($(this).val(), 'data-sort');
             })
             $("#reset-search-btn").click(function(){
                 ///self.filterElement("all");
@@ -698,26 +692,32 @@
                 $("#jsn-quicksearch-field").val("");
             })
         },
-        // animation filter
+
+        // Animation filter
         elementFilter:function(value, data){
             var $container = $('#ig-add-element .jsn-items-list');
             var selector = '.jsn-item';
             var item = selector;
-            if(data == null) data = 'data-value';
+            if(data == null) {
+                data = 'data-value';
+            }
+            if(value == '' || value == 'all') {
+                selector += '['+data+'!="shortcode"]';
+            }
             if(value != '' && value != 'all')
                 selector += '['+data+'*="'+value+'"]';
             if(data == 'data-value'){
-                selector += '[data-type="'+$('#ig-add-element select.jsn-filter-button').val()+'"]';
+                selector += '[data-sort="'+$('#ig-add-element select.jsn-filter-button').val()+'"]';
             }
             $container.find(item).fadeOut(100);
             $container.find(selector).fadeIn();
-            
+
             if (value == 'shortcode') {
-            	$('#jsn-quicksearch-field').hide(100);
+                $('#jsn-quicksearch-field').hide(100);
             }else{
-            	if ($('#jsn-quicksearch-field').css('display') == 'none') {
-            		$('#jsn-quicksearch-field').show(100);
-            	}
+                if ($('#jsn-quicksearch-field').css('display') == 'none') {
+                    $('#jsn-quicksearch-field').show(100);
+                }
             }
         },
 
@@ -727,7 +727,7 @@
             if (value != "all") {
                 $(resultsFilter).find("li").hide();
                 $(resultsFilter).find("li").each(function () {
-                    var textField = (filter_data == 'value') ? $(this).attr("data-value").toLowerCase() : $(this).attr("data-type").toLowerCase();
+                    var textField = (filter_data == 'value') ? $(this).attr("data-value").toLowerCase() : $(this).attr("data-sort").toLowerCase();
                     if (textField.search(value.toLowerCase()) === -1) {
                         $(this).hide();
                     } else {
@@ -739,6 +739,53 @@
         }
     };
 
+    // Separate become common functions to call directly.
+    $.HandleCommon = $.HandleCommon || {};
+
+    // Confirm message when delete item
+    $.HandleCommon.removeConfirmMsg = function(item, type, column_to_row, callback){
+        var self = this;
+        var msg = "";
+        var show_confirm = 1;
+        switch(type){
+            case 'row':
+                if(item.find('.jsn-column-content').find('.shortcode-container').length == 0)
+                    show_confirm = 0;
+                msg = Ig_Translate.delete_row;
+                break;
+            case 'column':
+                var check_item = (column_to_row != null) ? column_to_row : item;
+                if(check_item.find('.shortcode-container').length == 0)
+                    show_confirm = 0;
+                msg = Ig_Translate.delete_column;
+                break;
+            default:
+                msg = Ig_Translate.delete_element;
+        }
+
+        var confirm_ = show_confirm ? confirm(msg) : true;
+        if(confirm_){
+            if(type == 'row'){
+                item.animate({opacity:0},300,JSNLayoutCustomizer.prototype.effect,function(){
+                    item.animate({height:0},300,JSNLayoutCustomizer.prototype.effect,function(){
+                        item.remove();
+                        JSNLayoutCustomizer.prototype.moveItemDisable($(".ig-pb-form-container.jsn-layout"));
+                    });
+                });
+            }
+            else if(type == 'column'){
+                item.animate({height:0},500,JSNLayoutCustomizer.prototype.effect,function(){
+                    item.remove();
+                    if(callback != null) callback();
+                });
+            }
+            else
+                item.remove();
+            return true;
+        }
+        else
+            return false;
+    };
 
     $(document).ready(function() {
         // IG PageBuilder: get textarea content
@@ -758,21 +805,27 @@
             text_content = $(this).val();
         });
 
-        // switch tab: Classic editor , IG PageBuilder
+        // Switch tab: Classic editor , IG PageBuilder
         $('#ig_editor_tabs a').click(function (e, init_layout) {
+            // Prevent click tab activated
+            if ( $(this).parent('li').attr('class') == 'active' )
+                return;
             e.preventDefault();
+
             var hash = this.hash;
-            // check if this is first time run
+
+            // Check if this is first time run
             init_layout = (init_layout != null) ? init_layout : false;
 
             $(this).tab('show');
 
-            // init IG PageBuilder
+            // Init IG PageBuilder
             if(this.hash == '#ig_editor_tab2' && layout == null){
                 layout = new JSNLayoutCustomizer();
-                layout.init($("#form-container .jsn-row-container"));
+                layout.init($(".ig-pb-form-container.jsn-layout .jsn-row-container"));
             }
-            // if it is first time run, don't sync content
+
+            // If it is first time run, don't sync content
             if(init_layout)
                 return;
 
@@ -780,25 +833,25 @@
             if($('#ig_deactivate_pb').val() == "1")
                 return;
 
-            // synchronous content from Classic editor to IG PageBuilder
-            // store content of current Tab
+            // Store content of current Tab
             var tab_content = '';
+
             switch (hash) {
 
                 // IG PageBuilder -> Classic Editor
                 case '#ig_editor_tab1':
-                    // check if content of IG PageBuilder is changed
+                    // Check if content of IG PageBuilder is changed
                     var old_ig_pg_html = ig_pg_html;
 
-                    // get Raw shortcodes content in IG PageBuilder tab
-                    var ig_pb_textarea_content = $('#form-container textarea').serialize();
+                    // Get Raw shortcodes content in IG PageBuilder tab
+                    var ig_pb_textarea_content = $('.ig-pb-form-container.jsn-layout textarea').serialize();
 
-                    // update value for ig_pg_html
+                    // Update value for ig_pg_html
                     if(ig_pg_html == '' || ig_pg_html != ig_pb_textarea_content){
                         ig_pg_html = ig_pb_textarea_content;
                     }
 
-                    // check if value is changed
+                    // Check if value is changed
                     if(old_ig_pg_html != ig_pg_html){
                         _change_pagebuilder = 1;
                     }
@@ -808,28 +861,34 @@
                         _change_pagebuilder = 0;
                     }
 
-                    // if changed
+                    // Get nice shortcodes content in IG PageBuilder tab
+                    $(".ig-pb-form-container.jsn-layout textarea[name^='shortcode_content']").each(function(){
+                        tab_content += $(this).val();
+                    });
+
+                    // Synchronize content of classic editor with IG PageBuilder
+                    var text_content_ = window.tinymce ? tinymce.get('content').getContent() : $('#ig_editor_tab1 #content').val();
+
+                    if (tab_content != text_content_) {
+                        _change_pagebuilder = 1;
+                    }
+
+                    // If changed
                     if(_change_pagebuilder){
-
-                        // get Nice shortcodes content in IG PageBuilder tab
-                        $("#form-container textarea[name^='shortcode_content']").each(function(){
-                            tab_content += $(this).val();
-                        });
-
-                        // disable WP Update button
+                        // Disable WP Update button
                         $('#publishing-action #publish').attr('disabled', true);
 
-                        // remove placeholder text which was inserted to &lt; and &gt;
+                        // Remove placeholder text which was inserted to &lt; and &gt;
                         tab_content = ig_pb_remove_placeholder(tab_content, 'wrapper_append', '');
 
-                        // update Classic Editor content
+                        // Update Classic Editor content
                         $.HandleElement.updateClassicEditor(tab_content, function(){
 
-                            // reset global variable
+                            // Reset global variable
                             tab_content = '';
                             _change_pagebuilder = 0;
 
-                            // reset condition variables
+                            // Reset condition variables
                             _change_editor = 0;
                             text_content = tab_content;
                             $('#ig-tinymce-change').val('0');
@@ -840,36 +899,49 @@
 
                 // Classic Editor -> IG PageBuilder
                 case '#ig_editor_tab2':
+                    // Show loading icon when switching to Pagebuilder tab
+                    if ( is_pagebuilder_tab == false ) {
+                        // Show loading indicator in Pagebuilder wrapper
+                        $("#form-container").css('opacity',0);
+                        $(".ig-pb-form-container.jsn-layout").hide();
+                        $("#ig-pbd-loading").css('display','block');
+                        is_pagebuilder_tab = true;
+                    }
+
+					// Synchronize content of classic editor with IG PageBuilder
+                    var text_content_ = window.tinymce ? tinymce.get('content').getContent() : $('#ig_editor_tab1 #content').val();
+
+                    if (tab_content != text_content_) {
+                        _change_editor = 1;
+                    }
 
                     // Check if content of Classic Editor Text / Visual has changed
                     if(_change_editor || $('#ig-tinymce-change').val() == "1"){
+                        // Remove Shortcode content which is not wrapped in row & column
+                        $('.ig-pb-form-container.jsn-layout #ig-tinymce-change').nextAll( ".jsn-item" ).remove();
 
-                        // remove Shortcode content which is not wrapped in row & column
-                        $('#form-container #ig-tinymce-change').nextAll( ".jsn-item" ).remove();
-
-                        // if content is empty, try to get again
+                        // If content is empty, try to get again
                         if( ! _change_editor && tinymce.get('content') ) {
                             text_content = tinymce.get('content').getContent();
                         } else {
                             text_content = $('#ig_editor_tab1 #content').val();
                         }
 
-                        // update latest content value
+                        // Update latest content value
                         tab_content = text_content;
 
-                        // update IG PageBuilder content
+                        // Update IG PageBuilder content
                         $.HandleElement.updatePageBuilder(tab_content, function(){
-                            // reset IG PageBuilder Layout manager
+                            // Reset IG PageBuilder Layout manager
                             layout.fnReset(layout,true);
                             layout.moveItemDisable(layout.wrapper);
                         });
 
-                        // reset condition variables
+                        // Reset condition variables
                         text_content = tab_content = '';
                         _change_editor = 0;
                         $('#ig-tinymce-change').val('0');
                     }
-
                     break;
             }
         })

@@ -10,15 +10,16 @@
  * Websites: http://www.www.innogears.com
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
+
 /**
- * Premade layout functions
+ * @todo : Related page template functions
  */
 if ( ! class_exists( 'IG_Pb_Helper_Layout' ) ) {
 
 	class IG_Pb_Helper_Layout {
 
 		/**
-		 * save premade layouts file
+		 * Save premade layouts file
 		 *
 		 * @param type $layout_name
 		 * @param type $layout_content
@@ -46,7 +47,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Layout' ) ) {
 		}
 
 		/**
-		 * get name of premade layouts file
+		 * Get name of premade layouts file
 		 */
 		static function get_premade_layouts() {
 			$path = IG_Pb_Helper_Functions::get_wp_upload_folder( '/ig-pb-layout/' );
@@ -100,7 +101,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Layout' ) ) {
 		}
 
 		/**
-		 * get content of premade layouts file, prinrt as template
+		 * Get content of premade layouts file, prinrt as template
 		 */
 		static function print_premade_layouts() {
 			$files = self::get_premade_layouts();

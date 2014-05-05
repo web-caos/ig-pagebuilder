@@ -18,7 +18,7 @@ class IG_Pb_Helper_Html_Label extends IG_Pb_Helper_Html {
 	static function render( $element ) {
 		$element = parent::get_extra_info( $element );
 		$label   = parent::get_label( $element );
-		$output  = "<span class='add-on {$element['class']}'>{$element['std']}</span>";
+		$output  = "<span class='add-on input-group-addon {$element['class']}'>{$element['std']}</span>";
 		return parent::final_element( $element, $output, $label );
 	}
 }

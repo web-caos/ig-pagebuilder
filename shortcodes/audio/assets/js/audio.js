@@ -17,7 +17,7 @@ jQuery( function ($){
 		var audio_source		= $('#param-audio_sources', $('#modalOptions'));
 		var soundcloud_file	= $('#param-audio_source_link', $('#modalOptions'));
 		var local_file	= $('#param-audio_source_local', $('#modalOptions'));
-		audio_source.select2();
+		audio_source.select2({minimumResultsForSearch:-1});
 		// Fix horizon scrollbar
 		audio_source.css('display', 'none');
 		$('.select2-offscreen', $('#parent-param-audio_sources')).css('display', 'none');
@@ -71,10 +71,10 @@ jQuery( function ($){
 	        }
 			soundcloud_file.parent().addClass('input-append');
 
-			soundcloud_file.after($('<span class="add-on"></span'));
+			soundcloud_file.after($('<span class="add-on input-group-addon"></span'));
 			var loading_icon	= $('<i class="audio-validate jsn-icon16 jsn-icon-loading" ></i>');
-			var ok_icon			= $('<i class="audio-validate icon-ok ig-label-des-tipsy" ></i>');
-			var ban_icon		= $('<i class="audio-validate icon-warning ig-label-des-tipsy" title="'+Ig_Translate.invalid_link+'"></i>');
+			var ok_icon			= $('<i class="audio-validate icon-ok" ></i>');
+			var ban_icon		= $('<i class="audio-validate icon-warning" data-original-title="'+Ig_Translate.invalid_link+'"></i>');
 			$('#modalOptions .audio-validate').remove();
 			soundcloud_file.next('.add-on').append(loading_icon);
 			audioxhr	= $.post(
@@ -96,7 +96,7 @@ jQuery( function ($){
             		soundcloud_file.next('.add-on').append(ok_icon);
             		var title	= '';
             		var res		= $.parseJSON(data);
-            		$(ok_icon).attr('title', res.content);
+            		$(ok_icon).attr('data-original-title', res.content);
             		if (res.type != 'list') {
             			$('#parent-param-audio_start_track', $('#modalOptions')).removeClass('ig_hidden_depend').addClass('ig_hidden_depend');
             		}else{
@@ -104,11 +104,10 @@ jQuery( function ($){
             		}
             	}
 
-            	$('#modalOptions .audio-validate').tipsy({
-                    gravity: 'e',
-                    html: true,
-                    fade: true
-                });
+            	$('#modalOptions .audio-validate').tooltip({
+            		html: true,
+            		placement: 'left'
+            	});
 
             });
 		}

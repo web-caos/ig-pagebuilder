@@ -24,17 +24,6 @@ class IG_Form_Field_Radio extends IG_Form_Field {
 	protected $type = 'radio';
 
 	/**
-	 * Default HTML attributes for input field element.
-	 *
-	 * @var  array
-	 */
-	protected $attributes = array(
-		'autocomplete' => 'off',
-		'class'        => '',
-		'type'         => 'radio',
-	);
-
-	/**
 	 * Indicate whether checkbox(es) should be rendered inline or not?
 	 *
 	 * @var  boolean

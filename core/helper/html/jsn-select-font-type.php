@@ -21,6 +21,7 @@ class IG_Pb_Helper_Html_Jsn_Select_Font_Type extends IG_Pb_Helper_Html {
 		$output = '';
 		$label = '';
 		if ( is_array( $options ) && count( $options ) > 0 ) {
+			$element['exclude_class'] = array( 'form-control' );
 			$element = parent::get_extra_info( $element );
 			$label   = parent::get_label( $element );
 
@@ -37,13 +38,18 @@ class IG_Pb_Helper_Html_Jsn_Select_Font_Type extends IG_Pb_Helper_Html {
 			$output .= '</select>';
 		}
 
-		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'this_assets_enqueue_modal' ) );
+		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'enqueue_assets_modal' ) );
 
 		return parent::final_element( $element, $output, $label );
 	}
 
-	// enqueue custom assets
-	static function this_assets_enqueue_modal( $scripts ){
+	/**
+     * Enqueue font selector assets
+     *
+     * @param array $scripts
+     * @return array
+     */
+	static function enqueue_assets_modal( $scripts ){
 		$scripts = array_merge( $scripts, array( 'ig-pb-joomlashine-fontselector-js', ) );
 
 		return $scripts;

@@ -35,8 +35,8 @@ class IG_Pb_Helper_Html_Table extends IG_Pb_Helper_Html {
 				$extract_params = IG_Pb_Helper_Shortcode::extract_params( ( $item['std'] ) );
 				$params = IG_Pb_Helper_Shortcode::generate_shortcode_params( $element_->items, NULL, $extract_params, TRUE, FALSE, $content );
 				$element_->shortcode_data();
-				if ( ! empty( $params['assign_title'] ) ) {
-					$content = $params['assign_title'];
+				if ( ! empty( $params['extract_title'] ) ) {
+					$content = $params['extract_title'];
 					$shortcode_data = $element_->config['shortcode_structure'];
 				}
 				$shortcode_data_arr[$idx] = $shortcode_data;
@@ -87,8 +87,8 @@ class IG_Pb_Helper_Html_Table extends IG_Pb_Helper_Html {
 		$items_html = "<table class='table table-bordered igpb-table-exceprt' id='table_content'>" . implode( '', $updated_html ) . '</table>';
 		// end Wrap
 
-		$buttons = '<button class="btn table_action" data-target="table_row">'.__( 'Add Row', IGPBL ).'</button>
-					<button class="btn table_action" data-target="table_column">'.__( 'Add Column', IGPBL ).'</button>';
+		$buttons = '<button class="btn btn-default table_action" data-target="table_row">'.__( 'Add Row', IGPBL ).'</button>
+					<button class="btn btn-default table_action" data-target="table_column">'.__( 'Add Column', IGPBL ).'</button>';
 
 		$output = "<div class='item-container has_submodal table_element'>
 						<div class='jsn-fieldset-filter'><div class='btn-toolbar clearafter'>$buttons</div></div>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @version    $Id$
- * @package    IG PageBuilder
+ * @package    IG PageBuilder Shortcodes
  * @author     InnoGears Team <support@innogears.com>
  * @copyright  Copyright (C) 2012 innogears.com. All Rights Reserved.
  * @license    GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,6 +11,12 @@
  */
 if ( ! class_exists( 'IG_Item_Accordion' ) ) {
 
+	/**
+	 * Create accordion child element.
+	 *
+	 * @package  IG PageBuilder Shortcodes
+	 * @since    1.0.0
+	 */
 	class IG_Item_Accordion extends IG_Pb_Shortcode_Child {
 
 		public function __construct() {
@@ -37,7 +43,7 @@ if ( ! class_exists( 'IG_Item_Accordion' ) ) {
 						'name'  => __( 'Heading', IGPBL ),
 						'id'    => 'heading',
 						'type'  => 'text_field',
-						'class' => 'jsn-input-xxlarge-fluid',
+						'class' => 'input-sm',
 						'role'  => 'title',
 						'std'   => __( IG_Pb_Utils_Placeholder::add_placeholder( 'Accordion Item %s', 'index' ), IGPBL ),
                         'tooltip' => __( 'Set heading text of item', IGPBL ),
@@ -46,7 +52,7 @@ if ( ! class_exists( 'IG_Item_Accordion' ) ) {
 						'name' => __( 'Body', IGPBL ),
 						'id'   => 'body',
 						'role' => 'content',
-						'type' => 'tiny_mce',
+						'type' => 'editor',
 						'std'  => IG_Pb_Helper_Type::lorem_text(),
                         'tooltip' => __( 'Set content of element', IGPBL ),
 					),

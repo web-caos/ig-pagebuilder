@@ -11,7 +11,6 @@
 
 // Define necessary attributes
 $this->attributes['type' ] = 'password';
-$this->attributes['class'] = 'jsn-input-large-fluid';
 
 if ( isset( $this->attributes['size'] ) ) {
 	$this->attributes['size'] = 10;

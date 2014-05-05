@@ -99,7 +99,7 @@
             layout_fn(e, $(this), val, loading, function(){
                 // get template content
                 var layout_content = '';
-                $("#form-container textarea[name^='shortcode_content']").each(function(){
+                $(".ig-pb-form-container textarea[name^='shortcode_content']").each(function(){
                     layout_content += $(this).val();
                 });
                 layout_content = ig_pb_remove_placeholder(layout_content, 'wrapper_append', '');
@@ -186,8 +186,7 @@
         }
     }
     
-    $(document).ready(function (){
-    	
+    $(document).ready(function (){    	
     	$.PremadePage.addPage();    	
     })
 })(jQuery);    

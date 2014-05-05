@@ -46,7 +46,7 @@ if ( ! class_exists( 'IG_Item_List' ) ) {
 						'name'    => __( 'Body', IGPBL ),
 						'id'      => 'body',
 						'role'    => 'content',
-						'type'    => 'tiny_mce',
+						'type'    => 'editor',
 						'std'     => IG_Pb_Helper_Type::lorem_text(),
 						'tooltip' => __( 'Set content of element', IGPBL )
 					),

@@ -20,23 +20,25 @@ $field->get( 'input' );
 
 elseif ( 'horizontal' == $alignment ) :
 ?>
-	<div class="control-group">
+	<div class="form-group clearfix">
 		<?php if ( null != $field->get( 'label', null, true ) ) : ?>
-		<label class="control-label" for="<?php $field->get( 'id' ); ?>">
+		<label class="col-sm-2 control-label" for="<?php $field->get( 'id' ); ?>">
 			<?php $field->get( 'label' ); ?>
-			<i class="ig-form-field-help icon-help has-tips" title="<?php $field->get( 'desc' ); ?>"></i>
+			<i class="ig-form-field-help icon-help" data-toggle="tooltip" title="<?php $field->get( 'desc' ); ?>"></i>
 		</label>
 		<?php endif; ?>
-		<div class="controls">
+		<div class="col-sm-10<?php if ( null == $field->get( 'label', null, true ) ) echo ' pull-right'; ?>">
 			<?php $field->get( 'input' ); ?>
 		</div>
 	</div>
 <?php else : ?>
-	<label class="control-label" for="<?php $field->get( 'id' ); ?>">
-		<?php $field->get( 'label' ); ?>
-		<i class="ig-form-field-help icon-help has-tips" title="<?php $field->get( 'desc' ); ?>"></i>
-	</label>
-	<?php $field->get( 'input' ); ?>
+	<div class="form-group">
+		<label for="<?php $field->get( 'id' ); ?>">
+			<?php $field->get( 'label' ); ?>
+			<i class="ig-form-field-help icon-help" data-toggle="tooltip" title="<?php $field->get( 'desc' ); ?>"></i>
+		</label>
+		<?php $field->get( 'input' ); ?>
+	</div>
 <?php
 endif;
 

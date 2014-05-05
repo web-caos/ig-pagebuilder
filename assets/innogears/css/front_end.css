@@ -1,14 +1,14 @@
 /*------------------------------------------------------
     Common css for front end
 ------------------------------------------------------*/
-.jsn-bootstrap .carousel h4{
+.jsn-bootstrap3 .carousel h4{
     color: #fff;
     font-weight: bold;
 }
-.jsn-bootstrap img[class*="img-"] { margin: 10px 0; }
+.jsn-bootstrap3 img[class*="img-"] { margin: 10px 0; }
 div.ig_text p.dropcap:first-letter { margin: 0.1em 0.2em 0.1em -0.05em; }
-.jsn-master .jsn-bootstrap .mejs-container,
-.jsn-master .jsn-bootstrap .local_file,
+.jsn-master .jsn-bootstrap3 .mejs-container,
+.jsn-master .jsn-bootstrap3 .local_file,
 iframe, object, video {
 	max-width: 100%;
 }
@@ -38,13 +38,6 @@ iframe, object, video {
 .wp-audio-shortcode {
     margin: 10px 0;
 }
-/* === icons === */
-[class^="icon-"], [class*=" icon-"] {
-    margin-right: 8px;
-}
-.ig-element-list [class^="icon-"], [class*=" icon-"] {
-    margin-right: 0;
-}
 /* === tooltip === */
 .tipsy img {
     float: none !important;
@@ -70,7 +63,23 @@ iframe, object, video {
 	width: 42px;
 }
 
-/*------   Full width   ------*/
+/* === Full width === */
 .ig-full-width {
     overflow-x: hidden;
+}
+
+/* Video & audio No file selected */
+.jsn-bootstrap3 .ig-element-container p {
+    margin: 5px 0 15px;
+    padding: 0;
+}
+.jsn-bootstrap3 .ig-element-container > .jsn-bglabel {
+    background-position: center top;
+    background-repeat: no-repeat;
+    color: #D3D3D3;
+    font-size: 32px;
+    font-family: Arial,Helvetica,sans-serif;
+    line-height: 1.5em;
+    text-align: center;
+    margin-top: 65px;
 }

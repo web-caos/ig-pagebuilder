@@ -10,10 +10,11 @@
  * Websites: http://www.www.innogears.com
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+
+/**
+ * @todo : Defines values of setting options
  */
+
 if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 	class IG_Pb_Helper_Type {
@@ -58,7 +59,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Container style options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_container_style() {
 			return array(
@@ -180,7 +182,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Button size options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_button_size() {
 			return array(
@@ -193,7 +196,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * "Open in" option for anchor
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_open_in_options() {
 			return array(
@@ -205,7 +209,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Icon position for List shortcode
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_icon_position() {
 			return array(
@@ -216,7 +221,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Position options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_full_positions() {
 			return array(
@@ -229,7 +235,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Icon size options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_icon_sizes() {
 			return array(
@@ -243,7 +250,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Icon style for List shortcode
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_icon_background() {
 			return array(
@@ -254,7 +262,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Font options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_fonts() {
 			return array(
@@ -265,7 +274,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Text align options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_text_align() {
 			return array(
@@ -278,7 +288,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Font size options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_font_size_types() {
 			return array(
@@ -290,7 +301,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Border style options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_border_styles() {
 			return array(
@@ -307,7 +319,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Font style options
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function get_font_styles() {
 			return array(
@@ -320,7 +333,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Dummy content
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function lorem_text( $word_count = 50 ) {
 			return ucfirst( IG_Pb_Utils_Common::lorem_text( $word_count, true ) );
@@ -328,7 +342,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Dummy person name
-		 * @return type
+         *
+		 * @return array
 		 */
 		static function lorem_name() {
 			$usernames = array( 'Jane Poe', 'Robert Roe', 'Mark Moe', 'Brett Boe', 'Carla Coe', 'Donna Doe', 'Juan Doe', 'Frank Foe', 'Grace Goe', 'Harry Hoe', 'Jackie Joe', 'Karren Koe', 'Larry Loe', 'Marta Moe', 'Norma Noe', 'Paula Poe', 'Quintin Qoe', 'Ralph Roe', 'Sammy Soe', 'Tommy Toe', 'Vince Voe', 'William Woe', 'Xerxes Xoe', 'Yvonne Yoe', 'Zachary Zoe', 'John Smith', 'Udin Sedunia', 'Mubarok Bau' );
@@ -338,8 +353,9 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Get 1st option of array
-		 * @param type $arr
-		 * @return type
+         *
+		 * @param array $arr
+		 * @return array
 		 */
 		static function get_first_option( $arr ) {
 			foreach ( $arr as $key => $value ) {
@@ -383,8 +399,9 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Posts list
+         *
 		 * @global type $wpdb
-		 * @return type
+		 * @return array
 		 */
 		static function get_posts() {
 			global $wpdb;
@@ -408,8 +425,9 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 
 		/**
 		 * Pages list
+         *
 		 * @param type $has_root
-		 * @return type
+		 * @return array
 		 */
 		static function get_pages( $has_root = false ) {
 			$pages = get_pages();
@@ -510,12 +528,12 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 			$taxonomies = self::get_public_taxonomies();
 			$post_types = self::get_post_types();
 			$arr = array(
-				'no_link' => __( 'No Link', IGPBL ),
-				'url' => __( 'URL', IGPBL ),
-				'single_entry' => array( 'text' => __( 'Single Entry', IGPBL ), 'type' => 'optiongroup' ),
+				'no_link' => __( 'No Action', IGPBL ),
+				'url' => __( 'Go to URL', IGPBL ),
+				'single_entry' => array( 'text' => __( 'Go to Single Entry', IGPBL ), 'type' => 'optiongroup' ),
 			);
 			$arr = array_merge( $arr, $post_types );
-			$arr = array_merge( $arr, array( 'taxonomy' => array( 'text' => __( 'Taxonomy Overview Page', IGPBL ), 'type' => 'optiongroup' ) ) );
+			$arr = array_merge( $arr, array( 'taxonomy' => array( 'text' => __( 'Go to Taxonomy Overview Page', IGPBL ), 'type' => 'optiongroup' ) ) );
 			$arr = array_merge( $arr, $taxonomies );
 			return $arr;
 		}
@@ -523,7 +541,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 		/**
 		 * Get single entry list: Post, Page, Product...
 		 *
-		 * @return type
+		 * @return array
 		 */
 		static function get_single_entry() {
 			$post_types = self::get_post_types();
@@ -557,7 +575,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 			$imageLinkType = array();
 			$linkTypes = self::get_link_types();
 			$imageLinkType = array_slice( $linkTypes, 0, 1 );
-			$imageLinkType['large_image'] = __( 'Large Image', IGPBL );
+			$imageLinkType['large_image'] = __( 'Show Large Image', IGPBL );
 			$imageLinkType = array_merge( $imageLinkType, array_slice( $linkTypes, 1 ) );
 			return $imageLinkType;
 		}
@@ -722,8 +740,8 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 					$sql   = $wpdb->prepare(
 							"SELECT *
 							FROM $wpdb->posts AS posts
-							WHERE posts.post_type = 'page' AND posts.post_status = 'publish'
-							ORDER BY posts.post_parent ASC , posts.post_title ASC", null
+							WHERE posts.post_type = %s AND posts.post_status = %s
+							ORDER BY posts.post_parent ASC , posts.post_title ASC", 'page', 'publish'
 							);
 					$data  = $wpdb->get_results( $sql );
 					$level = 0;
@@ -766,7 +784,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 							ON term_taxonomy.term_taxonomy_id = term_rel.term_taxonomy_id
 							INNER JOIN $wpdb->terms AS term
 							ON term_taxonomy.term_id = term.term_id
-							WHERE term_rel.object_id IN ( $arr_post_ids )", null
+							WHERE term_rel.object_id IN ( %s )", $arr_post_ids
 							);
 
 					$result = $wpdb->get_results( $sql );
@@ -875,7 +893,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 			$exclude_taxo[] = 'page';
 			$exclude_taxo[] = 'nav_menu_item';
 
-			$sql    = $wpdb->prepare( "SELECT DISTINCT( post_type ) FROM $wpdb->posts WHERE post_parent != 0", null );
+			$sql    = $wpdb->prepare( "SELECT DISTINCT( post_type ) FROM $wpdb->posts WHERE post_parent != %d", 0 );
 			$result = $wpdb->get_results( $sql );
 
 			foreach ( $result as $i => $item ) {
@@ -887,7 +905,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 			$sql    = $wpdb->prepare(
 					"SELECT term_taxonomy_id, taxonomy
 					FROM $wpdb->term_taxonomy
-					WHERE parent != 0", null
+					WHERE parent != %d", 0
 					);
 			$result = $wpdb->get_results( $sql );
 			foreach ( $result as $i => $item ) {
@@ -905,7 +923,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 		static function get_tax_no_parent() {
 			global $wpdb;
 			$arr_tax_no_parent = array();
-			$sql = $wpdb->prepare( "SELECT taxonomy, parent FROM $wpdb->term_taxonomy WHERE 1 = 1", null );
+			$sql = $wpdb->prepare( "SELECT taxonomy, parent FROM $wpdb->term_taxonomy WHERE 1 = %s", '1' );
 			$result = $wpdb->get_results( $sql );
 
 			$excluded = array();
@@ -1145,7 +1163,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Type' ) ) {
 		}
 
 		/**
-		 ** menu item options
+		 * menu item options
 		 *
 		 * @param string $check_val
 		 * @param array $attrs

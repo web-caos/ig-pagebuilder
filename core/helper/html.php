@@ -10,19 +10,18 @@
  * Websites: http://www.www.innogears.com
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
+
 /**
- * define HTML output of Element Types
+ * @todo : Define HTML output of element types
  */
+
 if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 
 	class IG_Pb_Helper_Html {
-		/************************************
-		 * HELPER FUNCTION DEFINIGION
-		 * ***********************************/
-		
+
 		/**
-		 * get dependency information of an element
-		 * @param type $element
+		 * Get dependency information of an element
+		 * @param array $element
 		 */
 		static function get_dependency( $element ) {
 			$depend_info = array( 'data' => '', 'class' => '' );
@@ -35,16 +34,22 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 		}
 
 		/**
-		 * get depend class & data to show/hide this option
+		 * Get depend class & data to show/hide this option
 		 *
-		 * @param type $element
+		 * @param array $element
 		 * @return type
 		 */
 		static function get_extra_info( $element ) {
 			// check if element has dependened elements
 			if ( ! isset( $element['class'] ) )
 				$element['class'] = '';
+			$element['class'] .= ' form-control input-sm';
 			$element['class'] .= ( ! empty($element['has_depend'] ) && $element['has_depend'] == '1') ? ' ig_has_depend' : '';
+			if ( isset( $element['exclude_class'] ) && is_array( $element['exclude_class'] ) ) {
+				foreach ( $element['exclude_class'] as $i => $class ) {
+					$element['class'] = str_replace( $class, '', $element['class'] );
+				}
+			}
 
 			$depend_info = self::get_dependency( $element );
 			$element['depend_class'] = $depend_info['class'];
@@ -53,17 +58,19 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 		}
 
 		/**
-		 * add parent class for option/ group of options
+		 * Add parent class for option/ group of options
+         *
 		 * @param type $output
 		 * @return type
 		 */
 		static function bound_options( $output ) {
-			return '<div class="controls">' . $output . '</div>';
+			return '<div class="controls col-xs-9">' . $output . '</div>';
 		}
 
 		/**
-		 * add data attributes for element
-		 * @param type $element
+		 * Add data attributes for element
+         *
+		 * @param array $element
 		 * @param type $output
 		 * @return type
 		 */
@@ -76,8 +83,9 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 		}
 
 		/**
-		 * get style info
-		 * @param type $element
+		 * Get style info
+         *
+		 * @param array $element
 		 * @param type $output
 		 * @return type
 		 */
@@ -98,7 +106,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 		/**
 		 * Output final HTML of a element
 		 *
-		 * @param type $element
+		 * @param array $element
 		 * @param type $output
 		 * @return type
 		 */
@@ -121,7 +129,7 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 				if ( ! ( isset($element['wrap'] ) && $element['wrap'] == '0' ) ) {
 					$output = self::bound_options( $output );
 				}
-				$wrap_class = ( ! isset( $element['wrap_class'] ) ) ? 'control-group' : $element['wrap_class'];
+				$wrap_class = ( ! isset( $element['wrap_class'] ) ) ? 'control-group form-group clearfix' : $element['wrap_class'];
 				$container_class   = isset( $element['container_class'] ) ? $element['container_class'] : '';
 				$depend_class      = isset( $element['depend_class'] ) ? $element['depend_class'] : '';
 				$depend_data       = isset( $element['depend_data'] ) ? $element['depend_data'] : '';
@@ -133,13 +141,24 @@ if ( ! class_exists( 'IG_Pb_Helper_Html' ) ) {
 
 		/**
 		 * Show/Hide label for a type element
-		 * @param type $element
+		 * @param array $element
 		 * @return type
 		 */
 		static function get_label( $element ) {
-			$tooltip_class = isset( $element['tooltip'] ) ? 'ig-label-des-tipsy' : '';
-			$tooltip_text  = ( $tooltip_class != '' ) ? 'data-title = "' . $element['tooltip'] . '"' : '';
-			$label = ( (isset($element['showlabel'] ) && $element['showlabel'] == '0') || ! isset( $element['name']) ) ? '' : "<label class='control-label' for='{$element['id']}'><span class='{$tooltip_class}' {$tooltip_text}>{$element['name']}</span></label>";
+			// Generate HTML code for label
+			$label = '';
+
+			if ( ( ! isset( $element['showlabel'] ) || $element['showlabel'] != '0' ) && isset( $element['name'] ) ) {
+				// Generate attributes for tooltip
+				$tooltip = '';
+
+				if ( isset( $element['tooltip'] ) ) {
+					$tooltip = 'data-toggle="tooltip" title = "' . $element['tooltip'] . '"';
+				}
+
+				$label = "<label class='col-xs-3 control-label' for='{$element['id']}' {$tooltip} ><span >{$element['name']}</span></label>";
+			}
+
 			return $label;
 		}
 

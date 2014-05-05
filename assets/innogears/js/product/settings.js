@@ -31,10 +31,14 @@
 	// Declare methods
 	IG_Pb_Settings.prototype = {
 		clear_cache: function(params_) {
-            var loading = params_.loading;
-            var message = params_.message;
+			var button     = $('#' + params_.button);
+			var cache_html = button.html();
+            var loading    = $(params_.loading);
+            var message    = params_.message;
+            
             loading.toggleClass('hidden');
-
+            loading.show();
+            button.addClass("disabled").attr("disabled", "disabled");
 			$.post(
                 params_.ajaxurl,
                 {
@@ -42,11 +46,15 @@
                     ig_nonce_check : params_._nonce
                 },
                 function(data) {
-                    loading.toggleClass('hidden');
+                	loading.hide();
                     message.html(data).toggleClass('hidden');
+                    var text_change = button.data('textchange');
+                    button.text(text_change);
                     setTimeout(function(){
                         message.toggleClass('hidden');
-                    }, 3000 );
+                        button.removeClass("disabled").removeAttr("disabled");
+                        button.html(cache_html);
+                    }, 1000 );
                 }
             );
 		}

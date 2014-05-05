@@ -33,7 +33,14 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 			$this->ig_localize();
 		}
 
-		public function apply_assets( $assets ){
+		/**
+		 * Register custom assets to use on Modal
+		 *
+		 * @param array $assets
+		 *
+		 * @return array
+		 */
+		public function apply_assets( $assets ) {
 			IG_Pb_Helper_Functions::load_bootstrap_3( $assets );
 			$assets['ig-pb-handlesetting-js'] = array(
 				'src' => IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/js/handle_setting.js',
@@ -45,15 +52,15 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 					'ver' => '1.0.0',
 				);
 			}
-			$assets['ig-pb-modal-css'] = array(
+			$assets['ig-pb-modal-css']             = array(
 				'src' => IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/css/modal.css',
 				'ver' => '1.0.0',
 			);
-			$assets['ig-pb-codemirror-css'] = array(
+			$assets['ig-pb-codemirror-css']        = array(
 				'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/' ) . '/codemirror/codemirror.css',
 				'ver' => '1.0.0',
 			);
-			$assets['ig-pb-codemirror-js'] = array(
+			$assets['ig-pb-codemirror-js']         = array(
 				'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/' ) . '/codemirror/codemirror.js',
 				'ver' => '1.0.0',
 			);
@@ -67,6 +74,9 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 			return $assets;
 		}
 
+		/**
+		 * Enqueue scripts
+		 */
 		public function enqueue_admin_script() {
 			IG_Pb_Helper_Functions::enqueue_scripts_modal();
 
@@ -74,36 +84,53 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 
 			IG_Pb_Helper_Functions::enqueue_scripts_end();
 
-			IG_Init_Assets::load( array( 'ig-pb-jquery-fancybox-js', 'ig-pb-placeholder' ) );
+			IG_Init_Assets::load( array( 'ig-pb-placeholder' , 'ig-pb-layout-js' ) );
 		}
 
+		/**
+		 * Enqueue style
+		 */
 		public function enqueue_admin_style() {
 			IG_Pb_Helper_Functions::enqueue_styles();
-			IG_Init_Assets::load( array( 'ig-pb-jquery-tipsy-css', 'ig-pb-modal-css', 'ig-pb-jquery-fancybox-css' ) );
-			if ( IG_Pb_Helper_Functions::is_preview() ) {
+
+			if ( ! IG_Pb_Helper_Functions::is_preview() ) {
+				IG_Init_Assets::load( array( 'ig-pb-modal-css' ) );
+			} else {
 				IG_Init_Assets::load( array( 'ig-pb-frontend-css' ) );
 			}
 		}
 
+		/**
+		 * Localize Script
+		 */
 		public function ig_localize() {
 			IG_Init_Assets::localize( 'ig-pb-handlesetting-js', 'Ig_Ajax', IG_Pb_Helper_Functions::localize_js() );
 		}
 
+		/**
+		 * Get related content for each Modal
+		 *
+		 * @param type $page
+		 */
 		public function preview_modal( $page = '' ) {
 			add_action( 'ig_pb_modal_page_content', array( &$this, 'content' . $page ), 10 );
 		}
 
+		/**
+		 * HTML content for Shortcode editing Modal
+		 */
 		public function content() {
 			include IG_PB_TPL_PATH . '/modal.php';
 
-			// load last assets: HandleSettings & hooked assets
+			// Load required assets
 			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-handlesetting-js', ) );
+
 			IG_Init_Assets::load( $assets );
 		}
 
 		/**
-         * Content for Layout Modal
-         */
+		 * HTML content for Page template Modal
+		 */
 		public function content_layout() {
 
 			include IG_PB_TPL_PATH . '/layout/list.php';
@@ -114,8 +141,8 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		}
 
 		/**
-         * Content for Custom css Modal
-         */
+		 * HTML content for Custom css Modal
+		 */
 		public function content_custom_css() {
 			$assets = apply_filters( 'ig_pb_assets_enqueue_modal', array( 'ig-pb-codemirror-css', 'ig-pb-codemirror-js', 'ig-pb-codemirrormode-css-js' ) );
 			IG_Init_Assets::load( $assets );
@@ -124,40 +151,48 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 
 		/**
 		 * Ignore settings key in array
-		 * @param type $options
-		 * @return type
+		 *
+		 * @param array $options
+		 *
+		 * @return array
 		 */
 		static function ignore_settings( $options ) {
 			if ( array_key_exists( 'settings', $options ) ) {
 				$options = array_slice( $options, 1 );
 			}
+
 			return $options;
 		}
 
 		/**
 		 * Add setting data to a tag
 		 *
-		 * @param type $tag
-		 * @param type $data
-		 * @param type $content
-		 * @return type
+		 * @param string $tag
+		 * @param array  $data
+		 * @param string $content
+		 *
+		 * @return string
 		 */
 		static function tab_settings( $tag, $data, $content ) {
 			$tag_data = array();
 			if ( ! empty( $data ) ) {
 				foreach ( $data as $key => $value ) {
-					if ( ! empty( $value ) )
+					if ( ! empty( $value ) ) {
 						$tag_data[] = "$key = '$value'";
+					}
 				}
 			}
 			$tag_data = implode( ' ', $tag_data );
+
 			return "<$tag $tag_data>$content</$tag>";
 		}
 
 		/**
 		 * get HTML of Modal Settings Box of Shortcode
-		 * @param type $options
-		 * @return type
+		 *
+		 * @param array $options
+		 *
+		 * @return string
 		 */
 		static function get_shortcode_modal_settings( $settings, $shortcode = '', $input_params = null, $raw_shortcode = null ) {
 			$i    = 0;
@@ -171,17 +206,17 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 					}
 				} else if ( $tab == 'generalaction' ) {
 					foreach ( $options as $option ) {
-						$option['id'] = isset( $option['id'] ) ? ( 'param-' . $option['id'] ) : '';
+						$option['id']      = isset( $option['id'] ) ? ( 'param-' . $option['id'] ) : '';
 						$general_actions[] = IG_Pb_Helper_Shortcode::render_parameter( $option['type'], $option );
 					}
 				} else {
-					$active = ( $i++ == 0 ) ? 'active' : '';
-					if ( $tab != 'Notab' ) {
-						$data_ = isset( $settings[$tab]['settings'] ) ? $settings[$tab]['settings'] : array();
-						$data_['href'] = "#$tab";
+					$active = ( $i ++ == 0 ) ? 'active' : '';
+					if ( strtolower( $tab ) != 'notab' ) {
+						$data_                = isset( $settings[$tab]['settings'] ) ? $settings[$tab]['settings'] : array();
+						$data_['href']        = "#$tab";
 						$data_['data-toggle'] = 'tab';
-						$content_ = ucfirst( $tab );
-						$tabs[] = "<li class='$active'>" . self::tab_settings( 'a', $data_, $content_ ) . '</li>';
+						$content_             = ucfirst( $tab );
+						$tabs[]               = "<li class='$active'>" . self::tab_settings( 'a', $data_, $content_ ) . '</li>';
 					}
 
 					$has_margin = 0;
@@ -194,7 +229,7 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 						if ( $has_margin && isset( $option['id'] ) && $option['id'] == 'div_margin' )
 							continue;
 
-						$type = $option['type'];
+						$type         = $option['type'];
 						$option['id'] = isset( $option['id'] ) ? ( 'param-' . $option['id'] ) : "$idx";
 						if ( ! is_array( $type ) ) {
 							$param_html[$option['id']] = IG_Pb_Helper_Shortcode::render_parameter( $type, $option, $input_params );
@@ -206,26 +241,41 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 								$sub_options['bound'] = '0';
 								/* for sub option, auto assign 'input-small' class */
 								$sub_options['class'] = isset( $sub_options['class'] ) ? ( $sub_options['class'] ) : '';
-								$type = $sub_options['type'];
+								$type                 = $sub_options['type'];
 								$output_inner .= IG_Pb_Helper_Shortcode::render_parameter( $type, $sub_options );
 							}
-							$option = IG_Pb_Helper_Html::get_extra_info( $option );
-							$label = IG_Pb_Helper_Html::get_label( $option );
+							$option                    = IG_Pb_Helper_Html::get_extra_info( $option );
+							$label                     = IG_Pb_Helper_Html::get_label( $option );
 							$param_html[$option['id']] = IG_Pb_Helper_Html::final_element( $option, $output_inner, $label );
 						}
 					}
-					if ( ! empty ( $param_html['param-div_margin'] ) ) {
-						$margin = $param_html['param-div_margin'];
+
+					if ( !empty( $param_html['param-copy_style_from'] ) ) {
 						array_pop( $param_html );
 						// move "auto extended margin ( top, bottom ) option" to top of output
+						$style_copy = array_shift( $param_html );
+						// Shift Preview frame from the array
 						$preview    = array_shift( $param_html );
-						$param_html = array_merge(
-							array(
-								$preview,
-								$margin,
-							),
-							$param_html
-						);
+
+						if ( ! empty ( $param_html['param-div_margin'] ) ) {
+							$margin = $param_html['param-div_margin'];
+							$param_html = array_merge(
+								array(
+									$preview,
+									$style_copy,
+									$margin,
+								),
+								$param_html
+							);
+						}else{
+							$param_html = array_merge(
+								array(
+									$preview,
+									$style_copy
+								),
+								$param_html
+							);
+						}
 					}
 
 					$param_html  = implode( '', $param_html );
@@ -243,10 +293,11 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		}
 
 		/**
-		 * generate tab with content, use for generating Modal
+		 * Generate tab with content, use for generating Modal
+		 *
 		 * @return string
 		 */
-		static function setting_tab_html( $shortcode, $tabs, $contents, $general_actions, $settings, $actions ){
+		static function setting_tab_html( $shortcode, $tabs, $contents, $general_actions, $settings, $actions ) {
 			$output = '<input type="hidden" value="' . $shortcode . '" id="shortcode_name" name="shortcode_name" />';
 
 			/* Tab Content - Styling */
@@ -280,9 +331,9 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 		/**
 		 * Append shortcode content tab to all element settings modal.
 		 *
-		 * @param   array   &$tabs          Current tabs array.
-		 * @param   array   &$contents      Currnt content array.
-		 * @param   string  $raw_shortcode  Raw shortcode content.
+		 * @param   array  &$tabs         Current tabs array.
+		 * @param   array  &$contents     Currnt content array.
+		 * @param   string $raw_shortcode Raw shortcode content.
 		 *
 		 * @return  void
 		 */
@@ -294,35 +345,9 @@ if ( ! class_exists( 'IG_Pb_Objects_Modal' ) ) {
 
 				// Generate content for shortcode content tab
 				$contents[] = '<div class="tab-pane clearfix" id="shortcode-content">'
-				. '<textarea id="shortcode_content" class="jsn-input-xxlarge-fluid" disabled="disabled">' . esc_textarea( $raw_shortcode ) . '</textarea>'
-				. '<div class="text-center"><button class="btn btn-success" id="copy_to_clipboard">' . __( 'Copy to Clipboard', IGPBL ) . '</button></div>'
-				. '</div>';
-
-				// Load ZeroClipboard JavaScript library for Shortcode Content tab
-				IG_Init_Assets::load( 'ig-zeroclipboard-js' );
-
-				$script = '
-		$(window).load(function() {
-			var textarea = $("#shortcode_content"), button = $("#copy_to_clipboard");
-
-			ZeroClipboard.config({ moviePath: "' . IG_PB_URI . '/assets/3rd-party/zeroclipboard/ZeroClipboard.swf" });
-			var client = new ZeroClipboard(button);
-			client.on("datarequested", function() {
-				// Copy shortcode content to clipboard
-				client.setText(textarea.val());
-
-				// Show message
-				button.addClass("disabled").attr("disabled", "disabled").html("' . __( 'Copy to clipboard', IGPBL ) . '<i class=\"icon-checkmark\"></i>");
-
-				// Schedule hiding the message
-				setTimeout(function() {
-					button.removeClass("disabled").removeAttr("disabled");
-					$("i", button).animate({"opacity": "0"}, 500, function (){$(this).hide()});
-				}, 1000);
-			});
-		});';
-
-				IG_Init_Assets::inline( 'js', $script );
+				. '<textarea id="shortcode_content" class="form-control" rows="10" disabled="disabled">' . esc_textarea( $raw_shortcode ) . '</textarea>'
+				. '<div class="text-center"><button class="btn btn-success" id="copy_to_clipboard" data-textchange="' . __( 'Done!', IGPBL ) . '">' . __( 'Copy to Clipboard', IGPBL ) . '</button></div>'
+					. '</div>';
 			} else {
 				// Generate hidden text area to hold raw shortcode
 				$contents[] = '<textarea class="hidden" id="shortcode_content">' . esc_textarea( $raw_shortcode ) . '</textarea>';

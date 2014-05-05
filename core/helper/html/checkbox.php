@@ -22,7 +22,8 @@ class IG_Pb_Helper_Html_Checkbox extends IG_Pb_Helper_Html {
 
 		$element['std'] = explode( '__#__', $element['std'] );
 		$output = $add_class = $linebreak = '';
-		$_class = isset( $element['class'] ) ? $element['class'] : 'checkbox inline';
+		$_class = isset( $element['class'] ) ? $element['class'] : 'checkbox-inline';
+		$_class = str_replace( 'form-control', '', $_class );
 		$_ig_has_depend = ( ! empty($element['has_depend'] ) && $element['has_depend'] == '1') ? ' ig_has_depend' : '';
 
 		foreach ( $element['options'] as $key => $text ) {

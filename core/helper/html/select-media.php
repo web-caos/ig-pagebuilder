@@ -19,10 +19,10 @@ class IG_Pb_Helper_Html_Select_Media extends IG_Pb_Helper_Html {
 		$element = parent::get_extra_info( $element );
 		$label = parent::get_label( $element );
 		$_filter_type = isset( $element['filter_type'] ) ? $element['filter_type'] : 'image';
-		$output = '<div class="input-append row-fluid">
+		$output = '<div class="input-append row-fluid input-group">
 							<input type="text" class="' . $element['class'] . '" value="' . $element['std'] . '" id="' . $element['id'] . '">
-							<button class="btn select-media" filter_type="' . $_filter_type . '" id="' . $element['id'] . '_button" type="button">...</button>
-							<button class="btn btn-icon select-media-remove" type="button"><i class="icon-remove"></i></button>
+							<span class="input-group-addon select-media btn btn-default" filter_type="' . $_filter_type . '" id="' . $element['id'] . '_button">...</span>
+							<span class="input-group-addon select-media-remove btn btn-default"><i class="icon-remove"></i></span>
 						</div>';
 		return parent::final_element( $element, $output, $label );
 	}

@@ -12,15 +12,6 @@
 // Check if this section has own template
 $tmpl = IG_Loader::get_path( "form/tmpl/section/{$sid}.php" );
 
-// Check if this section has additional attributes
-if ( isset( $section['attributes'] ) ) {
-	foreach ( $section['attributes'] as $k => $v ) {
-		$section['attributes'][$k] = esc_attr( $k ) . '="' . esc_attr( $v ) . '"';
-	}
-}
-?>
-<div id="ig-form-section-<?php esc_attr_e( $sid ); ?>" <?php if ( isset( $section['attributes'] ) ) echo '' . implode( ' ', $section['attributes'] ); ?>>
-<?php
 // Check if a specific section is requested
 if ( empty( $section_id ) || $section_id == $sid ) :
 
@@ -57,5 +48,3 @@ else :
 endif;
 
 endif;
-?>
-</div>

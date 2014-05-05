@@ -37,8 +37,8 @@
 		            	if ( response.sizes ) {
 		            		var selectedValue 	= $('#param-image_image_size').val();
 		            		var currentValue	= $('#param-image_size').val();
-		            		var html_select 	= '<select id="select_image_image_size">';
-		            		var current_select 	= '<select id="select_image_size">';
+		            		var html_select 	= '<select id="select_image_image_size" class="select2-select">';
+		            		var current_select 	= '<select id="select_image_size" class="select2-select">';
 		            		var current_length	= 0;
 		            		$.each(response.sizes, function (key, value) {
 		            			var selected 			= '';
@@ -63,7 +63,7 @@
 			            			if ( current_length != 0 && value.total_size > current_length )
 			            				html_select 	+= '<option value="' + key.toLowerCase() + '" ' + selected + ' >' + key + ' – ' + value.width + ' &times; ' + value.height + '</option>';
 		            			} else {
-		            				html_select 	= '<select id="select_image_image_size"><option value="" >'+Ig_Translate.noneTxt+'</option>';
+		            				html_select 	= '<select id="select_image_image_size" class="select2-select"><option value="" >'+Ig_Translate.noneTxt+'</option>';
 		            			}
 
 		            		});
@@ -81,11 +81,31 @@
 		                	$('#select_image_image_size').trigger('change');
 		            	}
 	            		$('#modalOptions .image_loader').hide();
+	            		$('#select_image_size').select2('destroy').select2({minimumResultsForSearch:-1});
 		            }
 		        );
     		} else {
-    			$('#param-image_size_wrapper').html('<select id="select_image_size"><option value="" >'+Ig_Translate.noneTxt+'</option></select>');
-        		$('#param-image_image_size_wrapper').html('<select id="select_image_image_size"><option value="" >'+Ig_Translate.noneTxt+'</option></select>');
+    			$('#param-image_size_wrapper').html('<select id="select_image_size" class="select2-select"><option value="" >'+Ig_Translate.noneTxt+'</option></select>');
+        		$('#param-image_image_size_wrapper').html('<select id="select_image_image_size" class="select2-select"><option value="" >'+Ig_Translate.noneTxt+'</option></select>');
+    		}
+    		
+    		// Hide image size, alt text, onclick... fields when image file empty value
+    		if ( ! $(this).val() ) {
+    			$('#parent-param-image_size').addClass('hide');
+    			$('#parent-param-image_alt').addClass('hide');
+    			$('#parent-param-link_type').addClass('hide');
+    			$('#parent-param-image_image_size').addClass('hide');
+    			$('#parent-param-image_type_url').addClass('hide');
+    			$('#parent-param-single_item').addClass('hide');
+    			$('#parent-param-open_in').addClass('hide');
+    		} else {
+    			$('#parent-param-image_size').removeClass('hide');
+    			$('#parent-param-image_alt').removeClass('hide');
+    			$('#parent-param-link_type').removeClass('hide');
+    			$('#parent-param-image_image_size').removeClass('hide');
+    			$('#parent-param-image_type_url').removeClass('hide');
+    			$('#parent-param-single_item').removeClass('hide');
+    			$('#parent-param-open_in').removeClass('hide');
     		}
     	});
 
@@ -98,6 +118,13 @@
 
 	$(document).ready(function () {
 		$.IG_ImageElement();
+		
+		// Specific add select2 for large image
+		$('#param-link_type').on('change', function () {
+			if ( $(this).val() == 'large_image' ) {
+				$('#select_image_image_size').select2('destroy').select2({minimumResultsForSearch:-1});
+			}
+		});
 	});
 
 })(jQuery)

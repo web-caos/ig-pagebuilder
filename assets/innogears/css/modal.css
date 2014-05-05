@@ -1,8 +1,8 @@
 /*------------------------------------------------------
-    For MODAL only
+    For IG modal
 ------------------------------------------------------*/
 
-/* Remove Margin CSS */
+/* === Remove Margin CSS === */
 #wpcontent{
     margin-left: 0 !important;
 }
@@ -12,7 +12,7 @@
 .wp-toolbar{
     padding-top: 0 !important;
 }
-/* Hide Admin bar & menu in Modal */
+/* === Hide Admin bar & menu in Modal === */
 #wpadminbar,
 #adminmenuwrap,
 #adminmenuback,
@@ -23,9 +23,6 @@
 {
     display: none !important;
 }
-.select2-choice{
-	min-width: 140px;
-}
 #shortcode_inner_wrapper {
 	height: 200px;
 	overflow-y: scroll;
@@ -33,7 +30,7 @@
     margin-top: -15px;
 }
 
-/* Premade template */
+/* === Premade template === */
 .igpb-layout-item {
     position: relative;
 }
@@ -73,20 +70,26 @@
     margin-bottom: 30px!important;
 }
 
-/*------   Custom Css   ------*/
-#shortcode-content .jsn-input-xxlarge-fluid,
-#ig-pb-custom-css-box .jsn-input-xxlarge-fluid {
-    width: 98%;
-}
-#shortcode-content .jsn-input-xxlarge-fluid {
+/* === Custom Css === */
+#shortcode-content .form-control {
 	margin-bottom: 10px;
 	height: 15em;
 }
-#shortcode-content button#copy_to_clipboard {    
+#shortcode-content button#copy_to_clipboard {
     width: 180px;
 }
-
 #shortcode-content button#copy_to_clipboard .icon-checkmark {
 	position: absolute;
 	margin-top: 3px;
+}
+
+.group-table .jsn-items-list {
+    border: none;
+    overflow: hidden;
+    padding: 0;
+    height: auto !important;
+}
+
+.group-table table {
+    margin-bottom: 0 !important;
 }

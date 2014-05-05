@@ -26,7 +26,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 		function element_config() {
 			$this->config['shortcode'] = strtolower( __CLASS__ );
 			$this->config['exception'] = array(
-				'require_js'       => array( 'row.js' ),
+				'admin_assets'       => array( 'row.js' ),
 			);
 		}
 
@@ -49,6 +49,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 						'id'         => 'background',
 						'type'       => 'select',
 						'std'        => 'none',
+						'class'		 => 'input-sm',
 						'options'    => array(
 							'none'     => __( 'None', IGPBL ),
 							'solid'    => __( 'Solid Color', IGPBL ),
@@ -89,7 +90,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 						'id'              => 'gradient_color_css',
 						'type'            => 'text_field',
 						'std'             => '',
-						'input-type'      => 'hidden',
+						'input_type'      => 'hidden',
 						'container_class' => 'hidden',
 						'dependency'      => array( 'background', '=', 'gradient' ),
 					),
@@ -176,7 +177,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 							array(
 								'id'           => 'border_width_value_',
 								'type'         => 'text_append',
-								'type_input'   => 'number',
+								'input_type'   => 'number',
 								'class'        => 'input-mini',
 								'std'          => '0',
 								'append'       => 'px',
@@ -186,7 +187,7 @@ if ( ! class_exists( 'IG_Row' ) ) {
 							array(
 								'id'           => 'border_style',
 								'type'         => 'select',
-								'class'        => 'input-medium',
+								'class'        => 'input-sm',
 								'std'          => 'solid',
 								'options'      => IG_Pb_Helper_Type::get_border_styles(),
 								'parent_class' => 'combo-item',
@@ -212,11 +213,18 @@ if ( ! class_exists( 'IG_Row' ) ) {
 						'div_padding_left'   => array( 'std' => '10' ),
 					),
 					array(
-						'name'    => __( 'Css Class suffix', IGPBL ),
+						'name'    => __( 'CSS Class', IGPBL ),
 						'id'      => 'css_suffix',
 						'type'    => 'text_field',
 						'std'     => __( '', IGPBL ),
 						'tooltip' => __( 'Add custom css class for the wrapper div of this element', IGPBL ),
+					),
+					array(
+						'name'    => __( 'ID', IGPBL ),
+						'id'      => 'id_wrapper',
+						'type'    => 'text_field',
+						'std'     => __( '', IGPBL ),
+						'tooltip' => __( 'Add custom id for the wrapper div of this element', IGPBL ),
 					),
 				)
 			);
@@ -376,7 +384,9 @@ if ( ! class_exists( 'IG_Row' ) ) {
 			}
 			$extra_class .= ! empty ( $atts['css_suffix'] ) ? ' ' . esc_attr( $atts['css_suffix'] ) : '';
 			$extra_class  = ltrim( $extra_class, ' ' );
-			return $custom_script . "<div class='jsn-bootstrap'>" . "<div class='row $extra_class' $style>" . IG_Pb_Helper_Shortcode::remove_autop( $content ) . '</div>' . '</div>';
+			$extra_id     = ! empty ( $atts['id_wrapper'] ) ? ' ' . esc_attr( $atts['id_wrapper'] ) : '';
+			$extra_id     = ! empty ( $extra_id ) ? "id='" . ltrim( $extra_id, ' ' ) . "'" : '';
+			return $custom_script . "<div class='jsn-bootstrap3'>" . "<div $extra_id class='row $extra_class' $style>" . IG_Pb_Helper_Shortcode::remove_autop( $content ) . '</div>' . '</div>';
 		}
 
 	}

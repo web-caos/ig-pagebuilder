@@ -17,6 +17,7 @@ class IG_Pb_Helper_Html_Jsn_Select_Font_Value extends IG_Pb_Helper_Html {
 	 */
 	static function render( $element ) {
 		$selected_value = $element['std'];
+		$element['exclude_class'] = array( 'form-control' );
 		$element = parent::get_extra_info( $element );
 		$label = parent::get_label( $element );
 

@@ -9,8 +9,9 @@
  * Websites: http://www.www.innogears.com
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
+
 /**
- * HTML for Custom css modal
+ * @todo : Custom CSS modal
  */
 
 $custom_css_item = '<li class="jsn-item ui-state-default"><label class="checkbox"><input type="checkbox" name="item-list" value="VALUE" CHECKED>VALUE</label></li>';
@@ -21,6 +22,7 @@ if ( empty ( $_GET['pid'] ) ) {
 }
 
 $post_id = esc_sql( $_GET['pid'] );
+
 // get custom css data
 $custom_css_data = IG_Pb_Helper_Functions::custom_css_data( isset ( $post_id ) ? $post_id : NULL );
 extract( $custom_css_data );
@@ -32,20 +34,22 @@ $_css_files_tooltip = 'Insert path to your CSS files, each line for each file.
 						<br>or absolute like:
 						<br> <i><u>http://yourwebsite.com/assets/css/yourfile.css</u></i>
 						';
+
+$_style    = '.tooltip-inner { min-width: 350px !important; } .top-cut .tooltip-inner { margin-top: 60px; }';
+IG_Init_Assets::inline( 'css', $_style, true );
 ?>
 
 <div class="jsn-master" id="ig-pb-custom-css-box">
-	<div class="jsn-bootstrap">
+	<div class="jsn-bootstrap3">
 
 		<!-- CSS files -->
-		<div class="control-group jsn-items-list-container ig-modal-content">
-			<label for="option-items-itemlist" class="control-label" ><?php _e( 'CSS files', IGPBL ); ?><i class="ig-label-des-tipsy icon-question-sign"  data-title="<?php _e( $_css_files_tooltip, IGPBL ); ?>"></i></label>
-
+		<div class="form-group control-group jsn-items-list-container ig-modal-content">
+			<label for="option-items-itemlist" class="control-label top-cut" ><?php _e( 'CSS Files', IGPBL ); ?><i class=" icon-question-sign"  data-toggle="tooltip"  data-title="<?php _e( $_css_files_tooltip, IGPBL ); ?>"></i></label>
 			<div class="controls">
 				<div class="jsn-buttonbar">
-					<button id="items-list-edit" class="btn btn-small">
+					<button id="items-list-edit" class="btn btn-default btn-sm">
 						<i class="icon-pencil"></i><?php _e( 'Edit', IGPBL ); ?></button>
-					<button id="items-list-save" class="btn btn-small btn-primary hidden">
+					<button id="items-list-save" class="btn btn-default btn-sm btn-primary hidden">
 						<i class="icon-ok"></i><?php _e( 'Done', IGPBL ); ?></button>
 				</div>
 				<ul class="jsn-items-list ui-sortable css-files-container">
@@ -65,16 +69,16 @@ if ( ! empty( $css_files ) ) {
 					?>
 				</ul>
 				<div class="items-list-edit-content hidden">
-					<textarea class="jsn-input-xxlarge-fluid" rows="5"></textarea></div>
+					<textarea class="col-xs-12" rows="5"></textarea></div>
 			</div>
 		</div>
 
 		<!-- Custom CSS code -->
 		<div class="control-group jsn-items-list-container ig-modal-content">
-			<label for="option-items-itemlist" class="control-label"><?php _e( 'Custom CSS code', IGPBL ); ?><i class="ig-label-des-tipsy icon-question-sign"  data-title="<?php _e( 'Input here custom CSS code you want to be loaded on this page', IGPBL ); ?>"></i></label>
+			<label for="option-items-itemlist" class="control-label"><?php _e( 'CSS Code', IGPBL ); ?><i class="icon-question-sign" data-toggle="tooltip" data-title="<?php _e( 'Input here custom CSS code you want to be loaded on this page', IGPBL ); ?>"></i></label>
 
 			<div class="controls">
-				<textarea id="custom-css" class="jsn-input-xxlarge-fluid css-code" rows="10"><?php echo esc_textarea( $css_custom ); ?></textarea>
+				<textarea id="custom-css" class="input-sm css-code" rows="10"><?php echo esc_textarea( $css_custom ); ?></textarea>
 			</div>
 		</div>
 

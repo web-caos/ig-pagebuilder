@@ -10,15 +10,19 @@
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
 
+/**
+ * @todo : List all page template
+ */
+
 $data = IG_Pb_Helper_Layout::get_premade_layouts();
 ?>
 
 <div class="jsn-master" id="ig-pb-layout-box">
-	<div class="jsn-bootstrap">
+	<div class="jsn-bootstrap3">
 		<div id="ig-layout-lib" >
 			<input type="hidden" id="ig-pb-layout-group" value="<?php echo esc_attr( IG_PAGEBUILDER_USER_LAYOUT ); ?>" />
 			<!-- Elements -->
-			
+
 				<?php
 				// Get only the templates which saved by user.
 				$user_templates = isset ( $data['files'] ) && isset ( $data['files'][IG_PAGEBUILDER_USER_LAYOUT] ) ? $data['files'][IG_PAGEBUILDER_USER_LAYOUT] : array();
@@ -31,7 +35,7 @@ if ( ! count( $user_templates ) ) {
 		$layout_name = IG_Pb_Helper_Layout::extract_layout_data( $path, 'name' );
 		$layout_name = empty ( $layout_name ) ? __( '&mdash; Untitled &mdash;' ) : $layout_name;
 		$content     = IG_Pb_Helper_Layout::extract_layout_data( $path, 'content' );
-		$items[]     = '<li data-type="element" data-value="user_layout" data-id="' . $name . '" class="jsn-item premade-layout-item" style="display: list-item;">				
+		$items[]     = '<li data-type="element" data-value="user_layout" data-id="' . $name . '" class="jsn-item premade-layout-item" style="display: list-item;">
 					' . $layout_name . '
 					<i class="icon-trash delete-item"></i>
 				<textarea style="display:none">' . $content . '</textarea>
@@ -44,7 +48,7 @@ if ( ! count( $user_templates ) ) {
 }
 
 				?>
-			
+
 		</div>
 	</div>
 </div>

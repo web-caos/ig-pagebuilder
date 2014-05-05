@@ -15,9 +15,17 @@
 
 class IG_Pb_Shortcode_Child extends IG_Pb_Shortcode_Element {
 
-	public function element_in_pgbldr( $content = '', $shortcode_data = '', $el_title = '' ) {
+	/**
+     * Over write parent method
+     *
+     * @param string $content
+     * @param string $shortcode_data
+     * @param string $el_title
+     * @return string
+     */
+	public function element_in_pgbldr( $content = '', $shortcode_data = '', $el_title = '', $index = '' ) {
 		$this->config['sub_element'] = true;
-		return parent::element_in_pgbldr( $content, $shortcode_data );
+		return parent::element_in_pgbldr( $content, $shortcode_data, $el_title, $index );
 	}
 
 }

@@ -25,6 +25,13 @@ class IG_Pb_Product_Plugin {
 	public static $pages = array( 'ig-pb-settings', 'ig-pb-addons' );
 
 	/**
+	 * Current IG PageBuilder settings.
+	 *
+	 * @var  array
+	 */
+	protected static $settings;
+
+	/**
 	 * Initialize IG PageBuilder plugin.
 	 *
 	 * @return  void
@@ -100,6 +107,11 @@ class IG_Pb_Product_Plugin {
 		}
 	}
 
+	/**
+	 * Load required assets.
+	 *
+	 * @return  void
+	 */
 	public static function load_assets() {
 		IG_Pb_Helper_Functions::enqueue_styles();
 		IG_Pb_Helper_Functions::enqueue_scripts_end();
@@ -116,23 +128,24 @@ class IG_Pb_Product_Plugin {
 	}
 
 	/**
-	 * Product settings page
+	 * Render settings page.
 	 *
 	 * @return  void
 	 */
 	public static function settings() {
 		// Load update script
-		IG_Init_Assets::load( array( 'ig-pb-settings-js', 'ig-pb-jquery-tipsy-css', 'ig-pb-jquery-tipsy-js' ) );
+		IG_Init_Assets::load( array( 'ig-pb-settings-js' ) );
 
 		include IG_PB_TPL_PATH . '/settings.php';
 	}
 
 	/**
-	 * Show settings form
+	 * Register settings with WordPress.
+	 *
+	 * @return  void
 	 */
 	public static function settings_form() {
-		// Add the section to reading settings so we can add our
-		// fields to it
+		// Add the section to reading settings so we can add our fields to it
 		$page    = 'ig-pb-settings';
 		$section = 'ig-pb-settings-form';
 
@@ -143,10 +156,12 @@ class IG_Pb_Product_Plugin {
 			$page
 		);
 
-		// Add the field with the names and function to use for our new
-		// settings, put it in our new section
-
+		// Add the field with the names and function to use for our settings, put it in our new section
 		$fields = array(
+			array(
+				'id'    => 'enable_for',
+				'title' => __( 'Enable PageBuilder for...', IGPBL ),
+			),
 			array(
 				'id'    => 'cache',
 				'title' => __( 'Enable Caching', IGPBL ),
@@ -192,52 +207,137 @@ class IG_Pb_Product_Plugin {
 
 	}
 
+	/**
+	 * Get current settings.
+	 *
+	 * @return  array
+	 */
 	public static function ig_pb_settings_options() {
-		$options  = array( 'ig_pb_settings_cache', 'ig_pb_settings_boostrap_js', 'ig_pb_settings_boostrap_css' );
-		$settings = array();
-		// get saved options value
-		foreach ( $options as $key ) {
-			$settings[$key] = get_option( $key, 'enable' );
+		if ( ! isset( self::$settings ) ) {
+			// Define options
+			$options  = array( 'ig_pb_settings_enable_for', 'ig_pb_settings_cache', 'ig_pb_settings_boostrap_js', 'ig_pb_settings_boostrap_css' );
+
+			// Get saved options value
+			self::$settings = array();
+
+			foreach ( $options as $key ) {
+				self::$settings[$key] = get_option( $key, 'enable' );
+			}
 		}
 
-		return $settings;
+		return self::$settings;
 	}
 
 	/**
-	 * check/select saved options
+	 * Check/select options.
 	 *
-	 * @param type $value
-	 * @param type $compare
-	 * @param type $check
+	 * @param   string  $value    Current value.
+	 * @param   string  $compare  Desired value for checking/selecting option.
+	 * @param   string  $check    HTML attribute of checked/selected state.
+	 *
+	 * @return  void
 	 */
 	public static function ig_pb_setting_show_check( $value, $compare, $check ) {
 		echo esc_attr( ( $value == $compare ) ? "$check='$check'" : '' );
 	}
 
-	public static function ig_pb_section_callback() {
+	/**
+	 * Setting section callback handler.
+	 *
+	 * @return  void
+	 */
+	public static function ig_pb_section_callback() {}
 
+	/**
+	 * Render HTML code for `Enable On` field.
+	 *
+	 * @return  void
+	 */
+	public static function ig_pb_setting_callback_enable_for() {
+		// Get all post types
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+
+		// Prepare post types as field options
+		$options = array();
+
+		global $_wp_post_type_features;
+
+		foreach ( $post_types as $slug => $defines ) {
+			// Filter supported post type
+			if ( 'attachment' != $slug && post_type_supports( $slug, 'editor' ) ) {
+				$options[ $slug ] = $defines->labels->name;
+			}
+		}
+
+		// Get current settings
+		$settings = self::ig_pb_settings_options();
+		extract( $settings );
+
+		// Render field options
+		$first = true;
+
+		foreach ( $options as $slug => $label ) :
+
+		// Prepare checking state
+		$checked = '';
+
+		if ( 'enable' == $ig_pb_settings_enable_for ) :
+			$checked = 'checked="checked"';
+		elseif ( is_array( $ig_pb_settings_enable_for ) && ( ! isset( $ig_pb_settings_enable_for[ $slug ] ) || 'enable' == $ig_pb_settings_enable_for[ $slug ] ) ) :
+			$checked = 'checked="checked"';
+		endif;
+
+		// Set value based on checking state
+		$value = empty( $checked ) ? 'disable' : 'enable';
+
+		if ( ! $first ) :
+			echo '<br />';
+		endif;
+		?>
+		<label for="ig_pb_settings_enable_for_<?php esc_attr_e( $slug ); ?>">
+			<input type="hidden" name="ig_pb_settings_enable_for[<?php esc_attr_e( $slug ); ?>]" value="<?php esc_attr_e( $value ); ?>" />
+			<input id="ig_pb_settings_enable_for_<?php esc_attr_e( $slug ); ?>" <?php _e( $checked ); ?> onclick="jQuery(this).prev().val(this.checked ? 'enable' : 'disable');" type="checkbox" autocomplete="off" />
+			<?php _e( $label ); ?>
+		</label>
+		<?php
+		$first = false;
+
+		endforeach;
+		?>
+		<p class="description">
+			<?php _e( 'Uncheck post types where you do not want IG PageBuilder to be activated.', IGPBL ); ?>
+		</p>
+		<?php
 	}
 
+	/**
+	 * Render HTML code for `Enable Caching` field.
+	 *
+	 * @return  void
+	 */
 	public static function ig_pb_setting_callback_cache() {
 		$settings = self::ig_pb_settings_options();
 		extract( $settings );
 		?>
-        <div>
-            <select name="ig_pb_settings_cache">
-                <option value="enable" <?php selected( $ig_pb_settings_cache, 'enable' ); ?>><?php _e( 'Yes', IGPBL ); ?></option>
-                <option value="disable" <?php selected( $ig_pb_settings_cache, 'disable' ); ?>><?php _e( 'No', IGPBL ); ?></option>
-            </select>
-            <button class="button button-default" id="ig-pb-clear-cache"><?php _e( 'Clear cache', IGPBL ); ?></button>
-            <!-- don't use Div tag here -->
-            <span class="hidden layout-loading"><i class="jsn-icon16 jsn-icon-loading"></i></span>
-            <span class="hidden layout-message alert"></span>
-        </div>
+		<div>
+			<select name="ig_pb_settings_cache">
+				<option value="enable" <?php selected( $ig_pb_settings_cache, 'enable' ); ?>><?php _e( 'Yes', IGPBL ); ?></option>
+				<option value="disable" <?php selected( $ig_pb_settings_cache, 'disable' ); ?>><?php _e( 'No', IGPBL ); ?></option>
+			</select>
+			<button class="button button-default" data-textchange="<?php _e( 'Done!', IGPBL ) ?>" id="ig-pb-clear-cache"><?php _e( 'Clear cache', IGPBL ); ?><i class="jsn-icon16 layout-loading jsn-icon-loading"></i></button>
+			<span class="hidden layout-message alert"></span>
+		</div>
 		<p class="description">
 			<?php _e( "Select 'Yes' if you want to cache CSS and JS files of IG PageBuilder", IGPBL ); ?>
 		</p>
 	<?php
 	}
 
+	/**
+	 * Render HTML code for `Load Bootstrap Assets` field.
+	 *
+	 * @return  void
+	 */
 	public static function ig_pb_setting_callback_bootstrap() {
 		$settings = self::ig_pb_settings_options();
 		extract( $settings );
@@ -249,14 +349,14 @@ class IG_Pb_Product_Plugin {
 		<label>
 			<input type="checkbox" name="ig_pb_settings_boostrap_css" value="enable" <?php checked( $ig_pb_settings_boostrap_css, 'enable' ); ?>> <?php _e( 'CSS', IGPBL ); ?>
 		</label>
-        <p class="description">
-            <?php _e( 'You should choose NOT to load Bootstrap CSS / JS if your theme or some other plugin installed on your website already loaded it.', IGPBL ); ?>
-        </p>
+		<p class="description">
+			<?php _e( 'You should choose NOT to load Bootstrap CSS / JS if your theme or some other plugin installed on your website already loaded it.', IGPBL ); ?>
+		</p>
 	<?php
 	}
 
 	/**
-	 * Render input fields for saving InnoGears Customer Account.
+	 * Render HTML code for `InnoGears Customer Account` field.
 	 *
 	 * @return  void
 	 */
@@ -280,9 +380,9 @@ class IG_Pb_Product_Plugin {
 				<?php _e( 'Password', IG_LIBRARY_TEXTDOMAIN ); ?>:
 				<input type="password" value="<?php esc_attr_e( $password ); ?>" class="input-xlarge" id="password" name="ig_customer_account[password]" autocomplete="off" />
 			</label>
-            <p class="description">
-                <?php _e( "Insert the customer account you registered on <a href='http://www.innogears.com' target='_blank'>www.innogears.com</a>. This account is only required when you want to update commercial plugins purchased from innogears.com.", IGPBL ); ?>
-            </p>
+			<p class="description">
+				<?php _e( "Insert the customer account you registered on <a href='http://www.innogears.com' target='_blank'>www.innogears.com</a>. This account is only required when you want to update commercial plugins purchased from innogears.com.", IGPBL ); ?>
+			</p>
 		</div>
 		<?php
 	}

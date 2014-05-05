@@ -24,7 +24,10 @@ class IG_Pb_Helper_Html_Select extends IG_Pb_Helper_Html {
 			$element  = parent::get_extra_info( $element );
 			$label    = parent::get_label( $element );
 			$multiple = ( isset( $element['multiple'] ) ) ? 'multiple="multiple"' : '';
-
+			// Add default select2 for all select html type
+			$element['class'] .= ' select2-select';
+			$element['class'] = str_replace( 'form-control', '', $element['class'] );
+			
 			$output = "<select id='{$element['id']}' name='{$element['id']}' class='{$element['class']}' {$multiple} >";
 			foreach ( $options as $key => $value ) {
 				if ( is_array( $value ) ) {
@@ -38,20 +41,25 @@ class IG_Pb_Helper_Html_Select extends IG_Pb_Helper_Html {
 			}
 			$output .= '</select>';
 			if ( isset( $element['append_text'] ) ) {
-				$output .= "<span class='add-on'>{$element['append_text']}</span>";
+				$output .= "<span class='add-on input-group-addon'>{$element['append_text']}</span>";
 			}
 			if ( isset( $element['multiple'] ) ) {
 				$output .= "<input type='hidden' id='{$element['id']}_select_multi' value='{$element['std']}' />";
 			}
 		}
 
-		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'this_assets_enqueue_modal' ) );
+		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'enqueue_assets_modal' ) );
 
 		return parent::final_element( $element, $output, $label );
 	}
 
-	// enqueue custom assets
-	static function this_assets_enqueue_modal( $scripts ){
+	/**
+     * Enqueue select2 assets
+     *
+     * @param array $scripts
+     * @return array
+     */
+	static function enqueue_assets_modal( $scripts ){
 		$scripts = array_merge( $scripts, array( 'ig-pb-jquery-select2-js', ) );
 
 		return $scripts;

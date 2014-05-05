@@ -10,7 +10,12 @@
  * Technical Support:  Feedback - http://www.innogears.com
  */
 if ( ! class_exists( 'IG_Item_Tab' ) ) {
-
+	/**
+	 * Create child Tab element
+	 * 
+	 * @package  IG PageBuilder Shortcodes
+	 * @since    1.0.0
+	 */
 	class IG_Item_Tab extends IG_Pb_Shortcode_Child {
 
 		public function __construct() {
@@ -37,7 +42,7 @@ if ( ! class_exists( 'IG_Item_Tab' ) ) {
 						'name'  => __( 'Heading', IGPBL ),
 						'id'    => 'heading',
 						'type'  => 'text_field',
-						'class' => 'jsn-input-xxlarge-fluid',
+						'class' => 'input-sm',
 						'role'  => 'title',
 						'std'   => __( IG_Pb_Utils_Placeholder::add_placeholder( 'Tab Item %s', 'index' ), IGPBL ),
                         'tooltip' => __( 'Set heading text of item', IGPBL ),
@@ -46,7 +51,7 @@ if ( ! class_exists( 'IG_Item_Tab' ) ) {
 						'name' => __( 'Body', IGPBL ),
 						'id'   => 'body',
 						'role' => 'content',
-						'type' => 'tiny_mce',
+						'type' => 'editor',
 						'std'  => IG_Pb_Helper_Type::lorem_text(),
                         'tooltip' => __( 'Set content of element', IGPBL ),
 					),

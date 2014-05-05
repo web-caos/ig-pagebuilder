@@ -3,7 +3,7 @@
  * Plugin Name: IG PageBuilder
  * Plugin URI:  http://www.innogears.com
  * Description: Awesome content builder for Wordpress websites
- * Version:     2.1.0
+ * Version:     2.2.1
  * Author:      InnoGears Team <support@www.innogears.com>
  * Author URI:  http://www.innogears.com
  * License:     GNU/GPL v2 or later http://www.gnu.org/licenses/gpl-2.0.html
@@ -70,7 +70,7 @@ class IG_Pb_Init {
 	}
 
 	/**
-	 * Load necessary files.
+	 * Include required files.
 	 *
 	 * @return  void
 	 */

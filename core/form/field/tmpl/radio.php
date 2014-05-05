@@ -34,10 +34,12 @@ if ( is_array( $label ) ) {
 	$label = $label['label'];
 }
 ?>
-	<label class="radio <?php if ( $this->inline ) echo 'inline'; ?>">
-		<input <?php $this->html_attributes( array( 'class', 'id', 'placeholder' ) ); ?> />
-		<?php esc_html_e( $label, $this->text_domain ); ?>
-	</label>
+	<div class="radio<?php if ( $this->inline ) echo '-inline'; ?>">
+		<label>
+			<input <?php $this->html_attributes( array( 'class', 'id', 'placeholder' ) ); ?> />
+			<?php esc_html_e( $label, $this->text_domain ); ?>
+		</label>
+	</div>
 <?php
 // Trigger click event if option is selected
 if ( isset( $this->attributes['onclick'] ) && isset( $this->attributes['checked'] ) ) {

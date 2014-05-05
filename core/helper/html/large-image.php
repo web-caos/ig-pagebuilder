@@ -18,6 +18,8 @@ class IG_Pb_Helper_Html_Large_Image extends IG_Pb_Helper_Html {
 	static function render( $element ) {
 		$element = parent::get_extra_info( $element );
 		$label   = parent::get_label( $element );
+		// Add default select2 for all large image html type
+		$element['class'] .= ' select2-select';
 		$output  = "<div id='{$element['id']}_wrapper' class='large_image_wrapper'><select id=\"select_{$element['id']}\"><option value=\"none\">".__( 'None', IGPBL ).'</option></select></div>';
 		$output .= "<div class='image_loader'></div>";
 		$output .= "<input type='hidden' id='{$element['id']}' class='{$element['class']}' value='{$element['std']}'  DATA_INFO />";

@@ -26,6 +26,7 @@ class IG_Pb_Helper_Html_Items_List extends IG_Pb_Helper_Html {
 		$element_clone['wrapper_item_start'] = "<li class='jsn-item jsn-iconbar-trigger'>";
 		$element_clone['wrapper_item_end']   = '</li>';
 		$element_clone['blank_output'] = '1';
+		$element['class'] = str_replace( 'form-control', '', $element['class'] );
 		$element_clone['class'] = ( isset($element['class'] ) ? $element['class'] : '') . ' ' . $options_type;
 
 		// re-arrange $element['options'] array by the order of value in $element['std']

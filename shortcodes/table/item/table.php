@@ -11,6 +11,12 @@
  */
 if ( ! class_exists( 'IG_Item_Table' ) ) {
 
+	/**
+	 * Create Table child element
+	 * 
+	 * @package  IG PageBuilder Shortcodes
+	 * @since    1.0.0
+	 */
 	class IG_Item_Table extends IG_Pb_Shortcode_Child {
 
 		public function __construct() {
@@ -64,7 +70,7 @@ if ( ! class_exists( 'IG_Item_Table' ) ) {
 						'id'              => 'tagname',
 						'type'            => 'text_field',
 						'std'             => 'td',
-						'input-type'      => 'hidden',
+						'input_type'      => 'hidden',
 						'container_class' => 'hidden',
                         'tooltip' => __( '', IGPBL ),
 					),
@@ -92,6 +98,7 @@ if ( ! class_exists( 'IG_Item_Table' ) ) {
 						'name'    => __( 'Row Style', IGPBL ),
 						'id'      => 'rowstyle',
 						'type'    => 'select',
+						'class'   => 'input-sm',
 						'std'     => IG_Pb_Helper_Type::get_first_option( IG_Pb_Helper_Type::get_table_row_color() ),
 						'options' => IG_Pb_Helper_Type::get_table_row_color(),
 						'tooltip' => __( 'Select a style for a row', IGPBL )
@@ -101,7 +108,7 @@ if ( ! class_exists( 'IG_Item_Table' ) ) {
 						'id'     => 'cell_content',
 						'role'   => 'content',
 						'role_2' => 'title',
-						'type'   => 'tiny_mce',
+						'type'   => 'editor',
 						'std'    => __( '', IGPBL ),
                         'tooltip' => __( 'Table content', IGPBL ),
 					),

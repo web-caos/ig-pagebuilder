@@ -8,6 +8,12 @@
  * @version		$Id$
  */
 
+//if uninstall not called from WordPress exit
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )
+	exit();
+
+include_once 'core/utils/common.php';
+
 // delete all other providers
 $providers = get_transient( '_ig_pb_providers' );
 if ( $providers ) {
@@ -20,15 +26,8 @@ if ( $providers ) {
 	}
 	delete_plugins( $list_plugins );
 }
-
-//if uninstall not called from WordPress exit
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )
-	exit();
-
-include_once 'core/utils/common.php';
-
-// remove cache folder
+// delete cache folder
 IG_Pb_Utils_Common::remove_cache_folder();
 
-// delele meta key
+// delete meta key
 IG_Pb_Utils_Common::delete_meta_key( array( '_ig_page_builder_content', '_ig_html_content', '_ig_page_active_tab', '_ig_post_view_count', '_ig_deactivate_pb', '_ig_page_builder_css_files', '_ig_page_builder_css_custom' ) );

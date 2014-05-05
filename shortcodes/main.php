@@ -11,18 +11,29 @@
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
 
+/**
+ * @todo : Define information of Buil-in Shortcodes of IG PageBuilder
+ */
+
 add_action( 'ig_pb_addon', 'ig_pb_builtin_sc_init' );
 
 function ig_pb_builtin_sc_init() {
 
+	/**
+	 * Main class to init Shortcodes
+	 * for IG PageBuilder
+	 *
+	 * @package  IG PageBuilder Shortcodes
+	 * @since    1.0.0
+	 */
 	class IG_Pb_Builtin_Shortcode extends IG_Pb_Addon {
 
 		public function __construct() {
 
-			// setup information
+			// Addon information
 			$this->set_provider(
 				array(
-					'name'             => 'InnoGears',
+					'name'             => __( 'Standard Elements', IGPBL ),
 					'file'             => __FILE__,
 					'shortcode_dir'    => dirname( __FILE__ ),
 					'js_shortcode_dir' => 'assets/js/shortcodes',
@@ -36,7 +47,9 @@ function ig_pb_builtin_sc_init() {
 			add_filter( 'plugin_action_links', array( &$this, 'plugin_action_links' ), 10, 2 );
 		}
 
-		// regiter & enqueue custom assets
+		/**
+         * Regiter & enqueue custom assets
+         */
 		public function custom_assets() {
 			// register custom assets
 			$this->set_assets_register(
@@ -51,11 +64,11 @@ function ig_pb_builtin_sc_init() {
 					)
 				)
 			);
-			// enqueue assets for Admin pages
+			// enqueue assets for WP Admin pages
 			$this->set_assets_enqueue_admin( array( 'ig-frontend-free-css' ) );
-			// enqueue assets for Modal setting iframe
+			// enqueue assets for IG Modal setting iframe
 			$this->set_assets_enqueue_modal( array( 'ig-frontend-free-js' ) );
-			// enqueue assets for Frontend
+			// enqueue assets for WP Frontend
 			$this->set_assets_enqueue_frontend( array( 'ig-frontend-free-css', 'ig-frontend-free-js' ) );
 		}
 

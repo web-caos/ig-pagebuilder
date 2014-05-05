@@ -20,7 +20,7 @@ class IG_Pb_Helper_Html_Button_Group extends IG_Pb_Helper_Html {
 		$label   = parent::get_label( $element );
 
 		$output = "<div class='btn-group'>
-		  <a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>
+		  <a class='btn btn-default dropdown-toggle' data-toggle='dropdown' href='#'>
 			".__( 'Convert to', IGPBL )."...
 			<span class='caret'></span>
 		  </a>

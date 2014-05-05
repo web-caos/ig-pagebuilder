@@ -10,6 +10,9 @@
  * Technical Support:  Feedback - http://www.www.innogears.com
  */
 
+/**
+ * @todo : IG PageBuilder Settings page
+ */
 ?>
 	<div class="wrap">
 
@@ -20,17 +23,17 @@
 		$saved = ( isset ( $_GET ) && $_GET['settings-updated'] == 'true' ) ? __( 'Settings saved.', IGPBL ) : __( 'Settings saved.', IGPBL );
 
 		$msg = $type = '';
-if ( isset ( $_GET['settings-updated'] ) && $_GET['settings-updated'] == 'true' ) {
-	$msg  = __( 'Settings saved.', IGPBL );
-	$type = 'updated';
-} else {
-	if ( $_GET['settings-updated'] != 'true' ) {
-		$msg  = __( 'Settings is not saved.', IGPBL );
-		$type = 'error';
-	}
-}
+        if ( isset ( $_GET['settings-updated'] ) && $_GET['settings-updated'] == 'true' ) {
+            $msg  = __( 'Settings saved.', IGPBL );
+            $type = 'updated';
+        } else {
+            if ( $_GET['settings-updated'] != 'true' ) {
+                $msg  = __( 'Settings is not saved.', IGPBL );
+                $type = 'error';
+            }
+        }
 
-if ( isset ( $_GET['settings-updated'] ) ) {
+        if ( isset ( $_GET['settings-updated'] ) ) {
 			?>
 			<div id="setting-error-settings_updated" class="<?php echo esc_attr( $type ); ?> settings-error">
 				<p><strong><?php echo esc_html( $msg ); ?></strong></p>
@@ -41,8 +44,8 @@ if ( isset ( $_GET['settings-updated'] ) ) {
 
 		$options = array( 'ig_pb_settings_cache', 'ig_pb_settings_boostrap_js', 'ig_pb_settings_boostrap_css' );
 		// submit handle
-if ( ! empty ( $_POST ) ) {
-	foreach ( $options as $key ) {
+        if ( ! empty ( $_POST ) ) {
+            foreach ( $options as $key ) {
 				$value = ! empty( $_POST[$key] ) ? 'enable' : 'disable';
 				update_option( $key, $value );
 			}
@@ -51,16 +54,12 @@ if ( ! empty ( $_POST ) ) {
 			IG_Pb_Helper_Functions::alert_msg( array( 'success', __( 'Your settings are saved successfully', IGPBL ) ) );
 		}
 		// get saved options value
-foreach ( $options as $key ) {
+        foreach ( $options as $key ) {
 			$$key = get_option( $key, 'enable' );
 		}
-		// check/select saved options
-function ig_pb_show_check( $value, $compare, $check ) {
-			echo esc_attr( ( $value == $compare ) ? $check : '' );
-		}
 
+		// show options form
 		?>
-
 		<form method="POST" action="options.php">
 			<?php
 			$page = 'ig-pb-settings';
@@ -79,22 +78,18 @@ $script = '
 			_nonce: "' . wp_create_nonce( IGNONCE ) . '",
 			button: "ig-pb-clear-cache",
 			button: "ig-pb-clear-cache",
-			loading: $("#ig-pb-clear-cache").next(".layout-loading"),
+			loading: "#ig-pb-clear-cache .layout-loading",
 			message: $("#ig-pb-clear-cache").parent().find(".layout-message"),
 		});
-        $(".ig-pb-tipsy-el").tipsy({
-            title: function() {
-                return this.getAttribute("data-title");
-            },
-            gravity: "w",
-            fade: true
-        });
         ';
 IG_Init_Assets::inline( 'js', $script );
 
+// Load inlide style
+$loading_img = IG_PB_URI . '/assets/innogears/images/icons-16/icon-16-loading-circle.gif';
 $style = '
-		.jsn-bootstrap { margin-top: 30px; }
-        .jsn-bootstrap .checkbox { background:#fff; }
+		.jsn-bootstrap3 { margin-top: 30px; }
+        .jsn-bootstrap3 .checkbox { background:#fff; }
         #ig-pb-clear-cache, .layout-message { margin-left: 6px; }
+        .jsn-icon-loading { background: url("' . $loading_img . '") no-repeat scroll left center; content: " "; display: none; height: 16px; width: 16px; float: right; margin-left: 20px; margin-top: -26px; padding-top: 10px; }
         ';
 IG_Init_Assets::inline( 'css', $style );

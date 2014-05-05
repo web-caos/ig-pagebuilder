@@ -18,7 +18,7 @@ jQuery( function ($){
 		var local_file	= $('#param-video_source_local', $('#modalOptions'));
 		var youtube		= $('#param-video_source_link_youtube', $('#modalOptions'));
 		var vimeo		= $('#param-video_source_link_vimeo', $('#modalOptions'));
-		video_source.select2();
+		video_source.select2({minimumResultsForSearch:-1});
 
 		// Fix horizon scrollbar
 		video_source.css('display', 'none');
@@ -74,8 +74,8 @@ jQuery( function ($){
 
 			obj.after($('<span class="add-on"></span'));
 			var loading_icon	= $('<i class="audio-validate jsn-icon16 jsn-icon-loading" ></i>');
-			var ok_icon			= $('<i class="audio-validate icon-ok ig-label-des-tipsy" ></i>');
-			var ban_icon		= $('<i class="audio-validate icon-warning ig-label-des-tipsy" title="'+Ig_Translate.invalid_link+'"></i>');
+			var ok_icon			= $('<i class="audio-validate icon-ok" ></i>');
+			var ban_icon		= $('<i class="audio-validate icon-warning" data-original-title="'+Ig_Translate.invalid_link+'"></i>');
 			$('#modalOptions .audio-validate').remove();
 			obj.next('.add-on').append(loading_icon);
 			audioxhr	= $.post(
@@ -97,7 +97,7 @@ jQuery( function ($){
             		loading_icon.remove();
             		obj.next('.add-on').append(ok_icon);
             		var res		= $.parseJSON(data);
-            		$(ok_icon).attr('title', res.content);
+            		$(ok_icon).attr('data-original-title', res.content);
             		// unhide "Show List" parameter if detected video url had list param
             		if (res.type == 'list') {
             			$('#parent-param-video_youtube_show_list', $('#modalOptions')).removeClass('ig_hidden_depend');
@@ -106,11 +106,10 @@ jQuery( function ($){
             		}
             	}
 
-            	$('#modalOptions .audio-validate').tipsy({
-                    gravity: 'e',
-                    html: true,
-                    fade: true
-                });
+            	$('#modalOptions .audio-validate').tooltip({
+            		html: true,
+            		placement: 'left'
+            	});
 
             });
 		}

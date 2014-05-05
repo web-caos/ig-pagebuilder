@@ -86,6 +86,7 @@ class IG_Form_Field {
 	 */
 	protected $attributes = array(
 		'autocomplete' => 'off',
+		'class'        => 'form-control',
 	);
 
 	/**
@@ -261,6 +262,10 @@ class IG_Form_Field {
 			'value'       => $this->value,
 			'placeholder' => $this->placeholder,
 		);
+
+		if ( in_array( $this->type, array( 'checkbox', 'number', 'password', 'radio', 'text' ) ) && ! isset( $this->attributes['type'] ) ) {
+			$this->attributes['type'] = $this->type;
+		}
 
 		$attrs = apply_filters( 'ig_form_field_attributes', array_merge( $default, $this->attributes ) );
 

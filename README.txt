@@ -1,9 +1,9 @@
 === IG Page Builder ===
 Contributors: innogears
 Tags: page builder, admin, content, visual, element, plugin, advanced, page elements, editor, layout, easy to use, page, post, responsive, widget
-Requires at least: 3.6
-Tested up to: 3.8
-Stable tag: 3.6
+Requires at least: 3.8
+Tested up to: 3.9
+Stable tag: 3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,15 @@ You can constantly use this page builder as a starter tool for your website buil
 3. Widget Window
 
 == Changelog ==
+= 2.2.1 =
+* Fixed Modal and select box z-index
+* Fixed Text Editor not fire change when saving 
+
+= 2.2.0 =
+* Improved Working performance
+* Improved Upgrade backend UI to bootstrap 3
+* Added Ajax modal setting mechanism
+* Improved InnoShortcode button in classic editor
 
 = 2.1.0 =
 * Added Custom Css for page feature

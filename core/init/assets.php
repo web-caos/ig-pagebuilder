@@ -25,50 +25,100 @@ class IG_Init_Assets {
 	 */
 	protected static $assets = array(
 		/**
-		 * Third party assets.
+		 * Bootstrap 2 based assets.
 		 */
-		'ig-bootstrap-css' => array(
-			'src' => 'assets/3rd-party/bootstrap/css/bootstrap.min.css',
+		'ig-bootstrap2-css' => array(
+			'src' => 'assets/3rd-party/bs2/bootstrap/css/bootstrap.min.css',
 			'ver' => '2.3.2',
-			'site' => 'admin',
 		),
 
-		'ig-bootstrap-responsive-css' => array(
-			'src' => 'assets/3rd-party/bootstrap/css/bootstrap-responsive.min.css',
-			'deps' => array( 'ig-bootstrap-css' ),
-			'ver' => '2.3.2',
-			'site' => 'admin',
+		'ig-bootstrap2-responsive-css' => array(
+			'src' => 'assets/3rd-party/bs2/bootstrap/css/bootstrap-responsive.min.css',
+			'deps' => array( 'ig-bootstrap2-css' ),
 		),
 
-		'ig-bootstrap-js' => array(
-			'src' => 'assets/3rd-party/bootstrap/js/bootstrap.min.js',
+		'ig-bootstrap2-js' => array(
+			'src' => 'assets/3rd-party/bs2/bootstrap/js/bootstrap.min.js',
 			'deps' => array( 'jquery' ),
-			'ver' => '2.3.2',
-			'site' => 'admin',
 		),
 
-		'ig-icomoon-css' => array(
-			'src' => 'assets/3rd-party/font-icomoon/css/icomoon.css',
+		'ig-bootstrap2-icomoon-css' => array(
+			'src' => 'assets/3rd-party/bs2/font-icomoon/css/icomoon.css',
+			'deps' => array( 'ig-bootstrap2-css' ),
 		),
 
+		'ig-bootstrap2-jsn-gui-css' => array(
+			'src' => 'assets/3rd-party/bs2/jsn/css/jsn-gui.css',
+			'deps' => array( 'ig-bootstrap2-css' ),
+		),
+
+		/**
+		 * Bootstrap 3 based assets.
+		 */
+		'ig-bootstrap3-css' => array(
+			'src' => 'assets/3rd-party/bs3/bootstrap/css/bootstrap.min.css',
+			'ver' => '3.0.0',
+		),
+
+		'ig-bootstrap3-responsive-css' => array(
+			'src' => 'assets/3rd-party/bs3/bootstrap/css/bootstrap-responsive.min.css',
+			'deps' => array( 'ig-bootstrap3-css' ),
+		),
+
+		'ig-bootstrap3-frontend-css' => array(
+			'src' => 'assets/3rd-party/bs3/bootstrap/css/bootstrap_frontend.min.css',
+			'ver' => '3.1.0',
+		),
+
+		'ig-bootstrap3-js' => array(
+			'src' => 'assets/3rd-party/bs3/bootstrap/js/bootstrap.min.js',
+			'deps' => array( 'jquery' ),
+			'ver' => '3.1.1',
+		),
+
+		'ig-bootstrap3-frontend-js' => array(
+			'src' => 'assets/3rd-party/bs3/bootstrap/js/bootstrap_frontend.min.js',
+			'deps' => array( 'jquery' ),
+			'ver' => '3.0.2',
+		),
+
+		'ig-bootstrap3-icomoon-css' => array(
+			'src' => 'assets/3rd-party/bs3/font-icomoon/css/icomoon.css',
+			'deps' => array( 'ig-bootstrap3-css' ),
+		),
+
+		/**
+		 * Bootstrap styles for jQuery UI.
+		 */
 		'ig-jquery-ui-css' => array(
 			'src' => 'assets/3rd-party/jquery-ui/css/ui-bootstrap/jquery-ui-1.9.0.custom.css',
 			'ver' => '1.9.0',
 		),
 
-		'ig-jsn-css' => array(
-			'src' => 'assets/3rd-party/jsn/css/jsn-gui.css',
-			'deps' => array( 'ig-bootstrap-css', 'ig-icomoon-css' ),
+		/**
+		 * Form assets.
+		 */
+		'ig-form-css' => array(
+			'src' => 'assets/innogears/css/form.css',
+			'deps' => array( 'ig-bootstrap3-responsive-css', 'ig-jquery-ui-css' ),
 		),
 
+		'ig-form-js' => array(
+			'src' => 'assets/innogears/js/form.js',
+			'deps' => array( 'ig-bootstrap3-js', 'jquery-ui-tabs' ),
+		),
+
+		/**
+		 * Assets for addons screen.
+		 */
 		'ig-addons-css' => array(
 			'src' => 'assets/innogears/css/addons.css',
-			'deps' => array( 'ig-jquery-ui-css', 'ig-jsn-css' ),
+			'deps' => array( 'ig-bootstrap3-responsive-css', 'ig-jquery-ui-css' ),
 		),
 
 		'ig-addons-js' => array(
 			'src' => 'assets/innogears/js/addons.js',
-			'deps' => array( 'jquery', 'jquery-ui-dialog' ),
+			'deps' => array( 'ig-bootstrap3-js', 'jquery-ui-dialog' ),
 		),
 	);
 
@@ -276,11 +326,12 @@ class IG_Init_Assets {
 	/**
 	 * Enqueue asset.
 	 *
-	 * @param   string  $handle  Asset handle.
+	 * @param   string   $handle  Asset handle.
+	 * @param   boolean  $footer  Whether to load script file in document footer?
 	 *
 	 * @return  void
 	 */
-	protected static function enqueue_asset( $handle ) {
+	public static function enqueue_asset( $handle, $footer = true ) {
 		if ( isset( self::$assets[ $handle ] ) && isset( self::$assets[ $handle ]['site'] ) ) {
 			if ( 'admin' == self::$assets[ $handle ]['site'] && ! defined( 'WP_ADMIN' ) ) {
 				return;
@@ -306,7 +357,7 @@ class IG_Init_Assets {
 			$args[] = self::$assets[ $handle ]['src'];
 			$args[] = isset( self::$assets[ $handle ]['deps'] ) ? self::$assets[$handle]['deps'] : array();
 			$args[] = isset( self::$assets[ $handle ]['ver']  ) ? self::$assets[$handle]['ver']  : false;
-			$args[] = true;
+			$args[] = $footer;
 
 			call_user_func_array( 'wp_enqueue_script', $args );
 		} else {
@@ -323,16 +374,18 @@ class IG_Init_Assets {
 	 *
 	 * @return  void
 	 */
-	protected static function print_inline( $type, $text = null, $no_wrap = false ) {
+	public static function print_inline( $type, $text = null, $no_wrap = false ) {
 		// Generate then print inline styles / scripts
 		$html = array();
 
 		if ( ! empty( $text ) || count( self::$inline[$type] ) ) {
 			if ( 'js' == $type ) {
 				$html[] = '<script type="text/javascript">';
-				$html[] = '(function($) {';
 
-				$no_wrap || $html[] = "\t$(document).ready(function() {";
+				if ( ! $no_wrap ) {
+					$html[] = '(function($) {';
+					$html[] = "\t$(document).ready(function() {";
+				}
 			} else {
 				$html[] = '<style type="text/css">';
 			}
@@ -340,9 +393,11 @@ class IG_Init_Assets {
 			$html[] = ! empty( $text ) ? $text : implode( "\n\n", self::$inline[$type] );
 
 			if ( 'js' == $type ) {
-				$no_wrap || $html[] = "\t});";
+				if ( ! $no_wrap ) {
+					$html[] = "\t});";
+					$html[] = '})(jQuery);';
+				}
 
-				$html[] = '})(jQuery);';
 				$html[] = '</script>';
 			} else {
 				$html[] = '</style>';
@@ -411,7 +466,7 @@ class IG_Init_Assets {
 		// Prepare assets path
 		foreach ( $assets AS $key => $value ) {
 			// Fine-tune asset location
-			if ( ! preg_match( '#^(https?:)?/#', $value['src'] ) AND @is_file( $base_path . '/' . $value['src'] ) ) {
+			if ( ! preg_match( '#^(https?:)?//#', $value['src'] ) AND @is_file( $base_path . '/' . $value['src'] ) ) {
 				// Update asset location
 				$value['src'] = $base_url . '/' . $value['src'];
 
@@ -420,6 +475,31 @@ class IG_Init_Assets {
 		}
 
 		return $assets;
+	}
+
+	/**
+	 * Generate handle for an asset file.
+	 *
+	 * @param   string  $asset   Asset file name.
+	 * @param   string  $prefix  Handle prefix.
+	 *
+	 * @return  string
+	 */
+	public static function file_to_handle( $asset, $prefix = 'ig-' ) {
+		$handle = basename( $asset );
+
+		if ( ! preg_match( '/\.(css|js)$/', $handle ) ) {
+			return $handle;
+		}
+
+		// Prepare handle
+		$handle = preg_replace( '/[_.]/', '-', $handle );
+
+		if ( strpos( $handle, $prefix ) === false ) {
+			$handle = $prefix . $handle;
+		}
+
+		return $handle;
 	}
 
 	/**
@@ -433,8 +513,8 @@ class IG_Init_Assets {
 
 		if ( ! isset( $registered ) ) {
 			// Admin or frontend?
-			$prefix = defined( 'WP_ADMIN' ) ? 'admin' : 'wp';
-			$prefix = ( class_exists( 'IG_Pb_Helper_Functions' ) && IG_Pb_Helper_Functions::is_modal() ) ? 'pb_admin' : $prefix;
+			$prefix = apply_filters( 'ig_asset_hook_prefix', defined( 'WP_ADMIN' ) ? 'admin' : 'wp' );
+
 			// Register actions
 			add_action( "{$prefix}_enqueue_scripts", array( __CLASS__, 'enqueue_scripts' ), 100 );
 			add_action( "{$prefix}_head"           , array( __CLASS__, 'head'            ), 100 );

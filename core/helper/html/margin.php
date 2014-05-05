@@ -37,9 +37,9 @@ class IG_Pb_Helper_Html_Margin extends IG_Pb_Helper_Html {
 			$_top = array(
 				'id' => $element['id'] . '_top',
 				'type' => 'text_append',
-				'type_input' => 'number',
+				'input_type' => 'number',
 				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['top_std'],
 				'append_before' => '<i class="icon-arrow-up"></i>',
 				'append' => 'px',
@@ -56,9 +56,9 @@ class IG_Pb_Helper_Html_Margin extends IG_Pb_Helper_Html {
 			$element['right_std'] = isset( $input_params[$_idx_right] ) ? $input_params[$_idx_right] : $element['right_std'];
 			$_right = array(
 				'id' => $element['id'] . '_right',
-				'type_input' => 'number',
+				'input_type' => 'number',
 				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['right_std'],
 				'append_before' => '<i class="icon-arrow-right"></i>',
 				'append' => 'px',
@@ -76,9 +76,9 @@ class IG_Pb_Helper_Html_Margin extends IG_Pb_Helper_Html {
 			$element['bottom_std'] = isset( $input_params[$_idx_bottom] ) ? $input_params[$_idx_bottom] : $element['bottom_std'];
 			$_bottom = array(
 				'id' => $element['id'] . '_bottom',
-				'type_input' => 'number',
+				'input_type' => 'number',
 				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['bottom_std'],
 				'append_before' => '<i class="icon-arrow-down"></i>',
 				'append' => 'px',
@@ -94,9 +94,9 @@ class IG_Pb_Helper_Html_Margin extends IG_Pb_Helper_Html {
 			$element['left_std'] = isset( $input_params[$_idx_left] ) ? $input_params[$_idx_left] : $element['left_std'];
 			$_left = array(
 				'id' => $element['id'] . '_left',
-				'type_input' => 'number',
+				'input_type' => 'number',
 				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['left_std'],
 				'append_before' => '<i class="icon-arrow-left"></i>',
 				'append' => 'px',

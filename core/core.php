@@ -74,14 +74,17 @@ class IG_Pb_Core {
 		add_filter( 'the_content', array( &$this, 'pagebuilder_to_frontend' ), 9 );
 		add_filter( 'the_content', 'do_shortcode' );
 		remove_filter( 'the_excerpt', 'wpautop' );
+
 		// enqueue js for front-end
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_scripts' ) );
+
 		// hook saving post
 		add_action( 'edit_post', array( &$this, 'save_pagebuilder_content' ) );
 		add_action( 'save_post', array( &$this, 'save_pagebuilder_content' ) );
 		add_action( 'publish_post', array( &$this, 'save_pagebuilder_content' ) );
 		add_action( 'edit_page_form', array( &$this, 'save_pagebuilder_content' ) );
 		add_action( 'pre_post_update', array( &$this, 'save_pagebuilder_content' ) );
+
 		// ajax action
 		add_action( 'wp_ajax_save_css_custom', array( &$this, 'save_css_custom' ) );
 		add_action( 'wp_ajax_delete_layout', array( &$this, 'delete_layout' ) );
@@ -96,29 +99,36 @@ class IG_Pb_Core {
 		add_action( 'wp_ajax_get_shortcode_tpl', array( &$this, 'get_shortcode_tpl' ) );
 		add_action( 'wp_ajax_text_to_pagebuilder', array( &$this, 'text_to_pagebuilder' ) );
 		add_action( 'wp_ajax_get_html_content', array( &$this, 'get_html_content' ) );
-
+		add_action( 'wp_ajax_get_same_elements', array( &$this, 'get_same_elements' ) );
+		add_action( 'wp_ajax_merge_style_params', array( &$this, 'merge_style_params' ) );
 		// add IGPB metabox
 		add_action( 'add_meta_boxes', array( &$this, 'custom_meta_boxes' ) );
+
 		// print html template of shortcodes
 		add_action( 'admin_footer', array( &$this, 'element_tpl' ) );
 		add_filter( 'tiny_mce_before_init', array( &$this, 'tinymce_before_init' ) );
 		add_filter( 'wp_handle_upload_prefilter', array( &$this, 'media_file_name' ), 100 );
+
 		// add IGPB button to Wordpress TinyMCE
-		add_filter( 'mce_buttons', array( &$this, 'filter_mce_button' ) );
 		add_filter( 'mce_external_plugins', array( &$this, 'filter_mce_plugin' ) );
+		add_action( 'media_buttons_context',  array( &$this, 'add_page_element_button' ) );
 
 		// Remove Gravatar from Ig Modal Pages
 		if ( is_admin() ) {
 			add_filter( 'bp_core_fetch_avatar', array( &$this, 'remove_gravatar' ), 1, 9 );
 			add_filter( 'get_avatar', array( &$this, 'get_gravatar' ), 1, 5 );
 		}
+
 		// add body class in backend
 		add_filter( 'admin_body_class', array( &$this, 'admin_bodyclass' ) );
+
 		// get image size
 		add_filter( 'ig_pb_get_json_image_size', array( &$this, 'get_image_size' ) );
+
 		// Editor hook before & after
 		add_action( 'edit_form_after_title', array( &$this, 'hook_after_title' ) );
 		add_action( 'edit_form_after_editor', array( &$this, 'hook_after_editor' ) );
+
 		// Frontend hook
 		add_filter( 'post_class', array( &$this, 'wp_bodyclass' ) );
 		add_action( 'wp_head', array( &$this, 'post_view' ) );
@@ -131,13 +141,16 @@ class IG_Pb_Core {
 		do_action( 'ig_pb_custom_hook' );
 	}
 
-	// Translation
+	/**
+     * Get translation file
+     */
 	function translation() {
 		load_plugin_textdomain( IGPBL, false, dirname( plugin_basename( IG_PB_FILE ) ) . '/languages/' );
 	}
 
 	/**
 	 * Register custom asset files
+     *
 	 * @param type $assets
 	 * @return string
 	 */
@@ -202,14 +215,17 @@ class IG_Pb_Core {
 	}
 
 	/**
-	 * Enqueue scripts & style for FRONT END
+	 * Enqueue scripts & style for Front end
 	 */
 	function frontend_scripts() {
-		// load css
-		$ig_pb_frontend_css = array( 'ig-pb-font-icomoon-css', 'ig-pb-joomlashine-frontend-css', 'ig-pb-frontend-css', 'ig-pb-frontend-responsive-css', 'ig-pb-jquery-tipsy-css', 'ig-pb-jquery-fancybox-css' );
+		/* Load stylesheets */
+		$ig_pb_frontend_css = array( 'ig-pb-font-icomoon-css', 'ig-pb-joomlashine-frontend-css', 'ig-pb-frontend-css', 'ig-pb-frontend-responsive-css' );
+
 		IG_Init_Assets::load( $ig_pb_frontend_css );
-		// load js
-		$ig_pb_frontend_js = array( 'jquery', 'jquery-ui', 'ig-pb-bootstrap-js', 'ig-pb-jquery-tipsy-js', 'ig-pb-jquery-mousewheel-js', 'ig-pb-jquery-fancybox-js', 'ig-pb-jquery-lazyload-js' );
+
+		// Load scripts
+		$ig_pb_frontend_js = array( 'ig-pb-bootstrap-js' );
+
 		IG_Init_Assets::load( apply_filters( 'ig_pb_assets_enqueue_frontend',  $ig_pb_frontend_js ) );
 	}
 
@@ -217,12 +233,11 @@ class IG_Pb_Core {
 	 * Add IG PageBuilder Metaboxes
 	 */
 	function custom_meta_boxes() {
-		$check = $this->check_condition( 'editor' );
-		if ( $check ){
+		if ( $this->check_support() ) {
 			add_meta_box(
-					'ig_page_builder'
-					, __( 'Page Builder', IGPBL )
-					, array( &$this, 'page_builder_html' )
+				'ig_page_builder',
+				__( 'Page Builder', IGPBL ),
+				array( &$this, 'page_builder_html' )
 			);
 		}
 	}
@@ -253,14 +268,18 @@ class IG_Pb_Core {
 		}
 	}
 
-	// Register IGPB Widget
+	/**
+     * Register IGPB Widget
+     */
 	function register_widget(){
 		register_widget( 'IG_Pb_Objects_Widget' );
 	}
+
 	/**
 	 * Regiter sub element
-	 * @param type $class
-	 * @param type $level
+     *
+	 * @param string $class
+	 * @param int $level
 	 */
 	private function register_sub_el( $class, $level = 1 ) {
 		$item  = str_repeat( 'Item_', intval( $level ) - 1 );
@@ -280,36 +299,50 @@ class IG_Pb_Core {
 	function element_tpl() {
 		ob_start();
 
-		// print template html of IG element
+		// Print template for IG PageBuilder elements
 		$elements = $this->get_elements();
+
 		foreach ( $elements as $type_list ) {
 			foreach ( $type_list as $element ) {
+				// Get element type
 				$element_type = $element->element_in_pgbldr();
+
+				// Print template tag
 				foreach ( $element_type as $element_structure ) {
 					echo balanceTags( "<script type='text/html' id='tmpl-{$element->config['shortcode']}'>\n{$element_structure}\n</script>\n" );
 				}
 			}
 		}
-		// print template html of Widget
+
+		// Print widget template
 		global $Ig_Pb_Widgets;
-		foreach ( $Ig_Pb_Widgets as $shortcode => $shortcode_obj ) {
-			if ( ! class_exists( 'IG_Widget' ) ) {
-				continue;
-			}
-			$element = new IG_Widget();
-			$modal_title = $shortcode_obj['identity_name'];
-			$element->config['shortcode'] = $shortcode;
-			$content = $element->config['exception']['data-modal-title'] = $modal_title;
-			$element->config['shortcode_structure'] = IG_Pb_Utils_Placeholder::add_placeholder( "[ig_widget widget_id=\"$shortcode\"]%s[/ig_widget]", 'widget_title' );
-			$element->config['el_type'] = $type;
-			$element_type = $element->element_in_pgbldr( $content );
-			foreach ( $element_type as $element_structure ) {
-				echo balanceTags( "<script type='text/html' id='tmpl-{$shortcode}'>\n{$element_structure}\n</script>\n" );
+
+		if ( class_exists( 'IG_Widget' ) ) {
+			foreach ( $Ig_Pb_Widgets as $shortcode => $shortcode_obj ) {
+				// Instantiate Widget element
+				$element = new IG_Widget();
+
+				// Prepare necessary variables
+				$modal_title = $shortcode_obj['identity_name'];
+				$content     = $element->config['exception']['data-modal-title'] = $modal_title;
+
+				$element->config['shortcode']           = $shortcode;
+				$element->config['shortcode_structure'] = IG_Pb_Utils_Placeholder::add_placeholder( "[ig_widget widget_id=\"$shortcode\"]%s[/ig_widget]", 'widget_title' );
+				$element->config['el_type']             = $type;
+
+				// Get element type
+				$element_type = $element->element_in_pgbldr( $content );
+
+				// Print template tag
+				foreach ( $element_type as $element_structure ) {
+					echo balanceTags( "<script type='text/html' id='tmpl-{$shortcode}'>\n{$element_structure}\n</script>\n" );
+				}
 			}
 		}
 
-
+		// Allow printing extra footer
 		do_action( 'ig_pb_footer' );
+
 		ob_end_flush();
 	}
 
@@ -329,7 +362,7 @@ class IG_Pb_Core {
 	}
 
 	/**
-	 * Doaction on modal page hook
+	 * Do action on modal page hook
 	 */
 	function modal_page_content() {
 		do_action( 'ig_pb_modal_page_content' );
@@ -337,6 +370,7 @@ class IG_Pb_Core {
 
 	/**
 	 * Hook before tinymce init
+     *
 	 * @param array $initArray
 	 * @return type
 	 */
@@ -359,7 +393,8 @@ JS;
 
 	/**
 	 * Save IG PageBuilder shortcode content of a post/page
-	 * @param type $post_id
+     *
+	 * @param int $post_id
 	 * @return type
 	 */
 	function save_pagebuilder_content( $post_id ) {
@@ -405,6 +440,7 @@ JS;
 
 	/**
 	 * Render shortcode preview in a blank page
+     *
 	 * @return Ambigous <string, mixed>|WP_Error
 	 */
 	function shortcode_iframe_preview() {
@@ -422,6 +458,7 @@ JS;
 			if ( ! preg_match( $pattern, trim( $params ) ) ) {
 				// get shortcode class
 				$class = IG_Pb_Helper_Shortcode::get_shortcode_class( $shortcode );
+
 				// get option settings of shortcode
 				$elements = $this->get_elements();
 				$elements = $this->get_elements();
@@ -437,12 +474,17 @@ JS;
 
 				$element->shortcode_data();
 
-				$sc_inner_content = $extract_params['sc_inner_content'];
-				$content = $element->element_shortcode( $extract_params, $sc_inner_content );
+				$_shortcode_content = $extract_params['_shortcode_content'];
+				$content = $element->element_shortcode( $extract_params, $_shortcode_content );
 			} else {
-				$content = IG_Pb_Helper_Shortcode::widget_content( array( $params ) );
+				$class = 'IG_Widget';
+				$content  = '<script type="text/javascript">jQuery.noConflict();</script>';
+				$content .= IG_Pb_Helper_Shortcode::widget_content( array( $params ) );
 			}
-			$html  = '<div id="shortcode_inner_wrapper" class="jsn-bootstrap">';
+			global $Ig_Pb_Preview_Class;
+			$Ig_Pb_Preview_Class = $class;
+
+			$html  = '<div id="shortcode_inner_wrapper" class="jsn-bootstrap3">';
 			$html .= $content;
 			$html .= '</div>';
 			echo balanceTags( $html );
@@ -501,8 +543,9 @@ JS;
 
 	/**
 	 * GET <script type='text/html'... template for shortcode element
+     *
 	 * @global type $Ig_Pb_Widgets
-	 * @return type
+	 * @return string
 	 */
 	function get_shortcode_tpl() {
 		if ( ! isset($_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) )
@@ -544,8 +587,9 @@ JS;
 	}
 
 	/**
-	 * Classic Editor to IG PageBuilder
-	 * @return type
+	 * Update PageBuilder when switch Classic Editor to IG PageBuilder
+     *
+	 * @return string
 	 */
 	function text_to_pagebuilder() {
 		if ( ! isset($_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) )
@@ -576,8 +620,8 @@ JS;
 	/**
 	 * Show IG PageBuilder content for Frontend post
 	 *
-	 * @param type $content
-	 * @return type
+	 * @param string $content
+	 * @return string
 	 */
 	function pagebuilder_to_frontend( $content ) {
 		global $post;
@@ -613,12 +657,17 @@ JS;
 		$content = IG_Pb_Helper_Shortcode::doshortcode_content( $content );
 
 		if ( ! empty( $content ) ) {
-			echo "<div class='jsn-bootstrap'>" . $content . '</div>';
+			echo "<div class='jsn-bootstrap3'>" . $content . '</div>';
 		}
 		exit;
 	}
 
-	// get media file name
+	/**
+     * Get media file name
+     *
+     * @param array $file
+     * @return array
+     */
 	function media_file_name( $file ) {
 		$file_name = iconv( 'utf-8', 'ascii//TRANSLIG//IGNORE', $file['name'] );
 		if ( $file_name ) {
@@ -628,22 +677,33 @@ JS;
 	}
 
 	/**
-     * Check condition to load IG PageBuilder content & assets
+     * Check condition to load IG PageBuilder content & assets.
      *
-     * @global type $pagenow
-     * @global type $post
-     * @param type $check_support
-     * @return type
+     * @return  boolean
      */
-	function check_condition( $check_support = '' ) {
+	function check_support() {
 		global $pagenow, $post;
-		if ( $pagenow == 'post.php' || $pagenow == 'post-new.php' || $pagenow == 'widgets.php' ) {
-			if ( ! empty ( $check_support ) ) {
+
+		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow || 'widgets.php' == $pagenow ) {
+			if ( 'widgets.php' != $pagenow ) {
+				// Check if IG PageBuilder is enabled for this post type
+				$settings  = IG_Pb_Product_Plugin::ig_pb_settings_options();
 				$post_type = get_post_type( $post->ID );
-				return post_type_supports( $post_type, $check_support );
+
+				if ( is_array( $settings['ig_pb_settings_enable_for'] ) ) {
+					if ( isset( $settings['ig_pb_settings_enable_for'][ $post_type ] ) ) {
+						return ( 'enable' == $settings['ig_pb_settings_enable_for'][ $post_type ] );
+					} else {
+						return post_type_supports( $post_type, 'editor' );
+					}
+				} elseif ( 'enable' == $settings['ig_pb_settings_enable_for'] ) {
+					return post_type_supports( $post_type, 'editor' );
+				}
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -653,16 +713,14 @@ JS;
 	 * @return  void
 	 */
 	function load_assets() {
-		$check = $this->check_condition( 'editor' );
-		if ( $check ){
-
-			// styles
+		if ( $this->check_support() ) {
+			// Load styles
 			IG_Pb_Helper_Functions::enqueue_styles();
 
-			// scripts
+			// Load scripts
 			IG_Pb_Helper_Functions::enqueue_scripts();
 
-			$scripts = array( 'ig-pb-jquery-select2-js', 'ig-pb-jquery-livequery-js', 'ig-pb-addpanel-js', 'ig-pb-jquery-resize-js', 'ig-pb-joomlashine-modalresize-js', 'ig-pb-layout-js', 'ig-pb-jquery-mousewheel-js', 'ig-pb-placeholder' );
+			$scripts = array( 'ig-pb-jquery-select2-js', 'ig-pb-addpanel-js', 'ig-pb-jquery-resize-js', 'ig-pb-joomlashine-modalresize-js', 'ig-pb-layout-js', 'ig-pb-placeholder' );
 			IG_Init_Assets::load( apply_filters( 'ig_pb_assets_enqueue_admin', $scripts ) );
 
 			IG_Pb_Helper_Functions::enqueue_scripts_end();
@@ -670,7 +728,7 @@ JS;
 	}
 
 	/**
-	 * function for register pagebuilder widget assets
+	 * Register pagebuilder widget assets
 	 *
 	 * @return void
 	 */
@@ -694,19 +752,21 @@ JS;
 	}
 
 	/**
-	 * Add Inno Button
+	 * Add Inno Button to Classic Editor
 	 *
-	 * @param type $buttons
-	 * @return type
+	 * @param array $context
+	 * @return array
 	 */
-	function filter_mce_button( $buttons ) {
-		// add a separation before our button, here our button's id is "ig_pb_button"
-		array_push( $buttons, '|', 'ig_pb_button' );
-		return $buttons;
+	function add_page_element_button( $context ) {
+		$icon_url = IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/images/ig-pgbldr-icon-black.png';
+		$context .= '<a title="' . __( 'Add Page Element', IGPBL ) . '" class="button" id="ig_pb_button" href="#"><i class="mce-ico mce-i-none" style="background-image: url(\'' . $icon_url . '\')"></i>' . __( 'Add Page Element', IGPBL ) . '</a>';
+
+		return $context;
 	}
 
 	/**
 	 * Add js file to handling event
+	 *
 	 * @param array $plugins
 	 * @return string
 	 */
@@ -715,7 +775,20 @@ JS;
 		return $plugins;
 	}
 
-	// Gravatar : use default avatar, don't request from gravatar server
+	/**
+     * Gravatar : use default avatar, don't request from gravatar server
+     *
+     * @param type $image
+     * @param type $params
+     * @param type $item_id
+     * @param type $avatar_dir
+     * @param type $css_id
+     * @param type $html_width
+     * @param type $html_height
+     * @param type $avatar_folder_url
+     * @param type $avatar_folder_dir
+     * @return type
+     */
 	function remove_gravatar( $image, $params, $item_id, $avatar_dir, $css_id, $html_width, $html_height, $avatar_folder_url, $avatar_folder_dir ) {
 
 		$default = IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/images/default_avatar.png';
@@ -728,13 +801,26 @@ JS;
 		}
 	}
 
-	// Gravatar : use default avatar
+	/**
+     * Gravatar : use default avatar
+     *
+     * @param type $avatar
+     * @param type $id_or_email
+     * @param type $size
+     * @param string $default
+     * @return type
+     */
 	function get_gravatar( $avatar, $id_or_email, $size, $default ) {
 		$default = IG_Pb_Helper_Functions::path( 'assets/innogears' ) . '/images/default_avatar.png';
 		return '<img src="' . $default . '" alt="avatar" class="avatar" width="60" height="60" />';
 	}
 
-	// filter admin body class
+	/**
+     * Add admin body class
+     *
+     * @param string $classes
+     * @return string
+     */
 	function admin_bodyclass( $classes ) {
 		$classes .= ' jsn-master';
 		if ( isset($_GET['ig_load_modal'] ) AND isset( $_GET['ig_modal_type']) ) {
@@ -743,7 +829,12 @@ JS;
 		return $classes;
 	}
 
-	// get image size
+	/**
+     * Get image size
+     *
+     * @param array $post_request
+     * @return string
+     */
 	function get_image_size( $post_request ) {
 		$response  = '';
 		$image_url = $post_request['image_url'];
@@ -765,13 +856,23 @@ JS;
 		return $response;
 	}
 
-	// filter frontend body class
+	/**
+     * Filter frontend body class
+     *
+     * @param array $classes
+     * @return array
+     */
 	function wp_bodyclass( $classes ) {
 		$classes[] = 'jsn-master';
 		return $classes;
 	}
 
-	// Update post view in frontend
+	/**
+     * Update post view in frontend
+     *
+     * @global type $post
+     * @return type
+     */
 	function post_view() {
 		global $post;
 		if ( ! isset($post ) || ! is_object( $post ) )
@@ -781,24 +882,31 @@ JS;
 		}
 	}
 
-	// after title hook
+	/**
+     * Add custom HTML code after title in Post editing page
+     *
+     * @global type $post
+     */
 	function hook_after_title() {
 		global $post;
-		$check = $this->check_condition( 'editor' );
-		if ( $check ) {
+
+		if ( $this->check_support() ) {
 			$ig_pagebuilder_content = get_post_meta( $post->ID, '_ig_page_builder_content', true );
-			// active tab
+
+			// Get active tab
 			$ig_page_active_tab = get_post_meta( $post->ID, '_ig_page_active_tab', true );
 			$tab_active         = isset( $ig_page_active_tab ) ? intval( $ig_page_active_tab ) : ( ! empty( $ig_pagebuilder_content ) ? 1 : 0 );
-			// deactivate pagebuilder
+
+			// Deactivate pagebuilder
 			$ig_deactivate_pb = get_post_meta( $post->ID, '_ig_deactivate_pb', true );
 			$ig_deactivate_pb = isset( $ig_deactivate_pb ) ? intval( $ig_deactivate_pb ) : 0;
 
 			$wrapper_style = $tab_active ? 'style="display:none"' : '';
+
 			echo '
                 <input id="ig_active_tab" name="ig_active_tab" value="' . $tab_active . '" type="hidden">
                 <input id="ig_deactivate_pb" name="ig_deactivate_pb" value="' . $ig_deactivate_pb . '" type="hidden">
-                <div class="jsn-bootstrap ig-editor-wrapper" ' . $wrapper_style . '>
+                <div class="jsn-bootstrap3 ig-editor-wrapper" ' . $wrapper_style . '>
                     <ul class="nav nav-tabs" id="ig_editor_tabs">
                         <li class="active"><a href="#ig_editor_tab1">' . __( 'Classic Editor', IGPBL ) . '</a></li>
                         <li><a href="#ig_editor_tab2">' . __( 'Page Builder', IGPBL ) . '</a></li>
@@ -808,10 +916,13 @@ JS;
 		}
 	}
 
-	// after editor hook
+	/**
+     * Add custom HTML code after text editor in Post editing page
+     *
+     * @global type $post
+     */
 	function hook_after_editor() {
-		$check = $this->check_condition( 'editor' );
-		if ( $check ) {
+		if ( $this->check_support() ) {
 			echo '</div><div class="tab-pane" id="ig_editor_tab2"><div id="ig_before_pagebuilder"></div></div></div></div>';
 		}
 	}
@@ -873,6 +984,7 @@ JS;
 
 	/**
 	 * Clear cache files
+     *
 	 * @return type
 	 */
 	function igpb_clear_cache() {
@@ -888,6 +1000,7 @@ JS;
 
 	/**
 	 * Save premade layout to file
+     *
 	 * @return type
 	 */
 	function save_layout() {
@@ -906,6 +1019,7 @@ JS;
 
 	/**
 	 * Upload premade layout to file
+     *
 	 * @return type
 	 */
 	function upload_layout() {
@@ -936,7 +1050,8 @@ JS;
 	}
 
 	/**
-	 * Reload layout box
+	 * Get list of Page template
+     *
 	 * @return type
 	 */
 	function reload_layouts_box() {
@@ -950,7 +1065,8 @@ JS;
 
 	/**
 	 * Delete group layout
-	 * @return type
+     *
+	 * @return html
 	 */
 	function delete_layouts_group() {
 		if ( ! isset( $_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) ) {
@@ -968,7 +1084,7 @@ JS;
 	/**
 	 * Delete layout
 	 *
-	 * @return type
+	 * @return int
 	 */
 	function delete_layout() {
 		if ( ! isset( $_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) ) {
@@ -986,7 +1102,8 @@ JS;
 
 	/**
 	 * Save custom CSS information: files, code
-	 * @return type
+     *
+	 * @return void
 	 */
 	function save_css_custom() {
 		if ( ! isset( $_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) ) {
@@ -998,6 +1115,117 @@ JS;
 		IG_Pb_Helper_Functions::custom_css( $post_id, 'css_files', 'put', esc_sql( $_POST['css_files'] ) );
 		IG_Pb_Helper_Functions::custom_css( $post_id, 'css_custom', 'put', esc_textarea( $_POST['custom_css'] ) );
 
+		exit;
+	}
+
+	/**
+	 * Get same type elements in a text
+     *
+	 * @return type
+	 */
+	function get_same_elements() {
+		if ( ! isset($_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) )
+			return;
+		$shortcode_name  = $_POST['shortcode_name'];
+		$content         = $_POST['content'];
+
+		// replace opening tag
+		$regex   = '\\[' // Opening bracket
+			. '(\\[?)' // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
+			. "($shortcode_name)" // 2: Shortcode name
+			. '(?![\\w-])' // Not followed by word character or hyphen
+			. '(' // 3: Unroll the loop: Inside the opening shortcode tag
+			. '[^\\]\\/]*' // Not a closing bracket or forward slash
+			. '(?:'
+			. '\\/(?!\\])' // A forward slash not followed by a closing bracket
+			. '[^\\]\\/]*' // Not a closing bracket or forward slash
+			. ')*?'
+			. ')'
+			. '(?:'
+			. '(\\/)' // 4: Self closing tag ...
+			. '\\]' // ... and closing bracket
+			. '|'
+			. '\\]' // Closing bracket
+			. ')'
+			. '(\\]?)'; // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
+
+		preg_match_all('#' . $regex . '#', $content, $out, PREG_SET_ORDER);
+
+		$select_options   = array();
+		$options          = array();
+
+		$k = 0;
+		foreach ( $out as $el ) {
+			$extracted_params  = IG_Pb_Helper_Shortcode::extract_params($el[0]);
+			if ( $extracted_params ) {
+				$k ++;
+				$el_title   = $extracted_params['el_title'] ? $extracted_params['el_title'] : __( '(Untitled)', IGPBL );
+				// Append unique number to ensure array key is unique
+				// for sorting purpose.
+				if ( isset( $options[$el_title] ) ) {
+					$options[$el_title . "___" . $k ] = $el[0];
+				}else{
+					$options[$el_title] = $el[0];
+				}
+
+			}
+		}
+
+		if ( count( $options ) ) {
+			// Sort the options by title
+			ksort( $options );
+
+			foreach ( $options as $title => $value ) {
+				if ( stripos( $value, '#_EDITTED' ) === false ) {
+					if ( strpos( $title, "___" ) !== false ) {
+						$title = substr( $title, 0, strpos( $title, "___" ) );
+					}
+					$select_options[]  = "<option value='" . $value . "'>" . $title . '</option>';
+				}
+			}
+
+		}
+
+		// Print out the options HTML for select box
+		echo implode('', $select_options);
+		exit;
+	}
+
+	/**
+	 * Merge new style params to existed shortcode content
+     *
+	 * @return type
+	 */
+	function merge_style_params() {
+		if ( ! isset($_POST[IGNONCE] ) || ! wp_verify_nonce( $_POST[IGNONCE], IGNONCE ) )
+			return;
+		$shortcode_name  = $_POST['shortcode_name'];
+		$structure       = str_replace( "\\", "", $_POST['content'] );
+		$alter_structure = str_replace( "\\", "", $_POST['new_style_content'] );
+
+		// Extract params of current element
+		$params    = IG_Pb_Helper_Shortcode::extract_params( $structure, $shortcode_name );
+
+		// Extract styling params of copied element
+		$alter_params  = IG_Pb_Helper_Shortcode::get_styling_atts( $shortcode_name , $alter_structure );
+
+		// Alter params of current element by copied element's params
+		if ( count( $alter_params ) ) {
+			foreach ( $alter_params as $k => $v ) {
+				$params[$k]    = $v;
+			}
+		}
+
+		$_shortcode_content = '';
+		// Exclude shortcode_content from param list
+		if ( isset ( $params['_shortcode_content'] ) ) {
+			$_shortcode_content  = $params['_shortcode_content'];
+			unset ($params['_shortcode_content']);
+		}
+
+		$new_shortcode_structure = IG_Pb_Helper_Shortcode::join_params($params, $shortcode_name, $_shortcode_content );
+		// Print out new shortcode structure.
+		echo $new_shortcode_structure;
 		exit;
 	}
 
@@ -1059,4 +1287,5 @@ JS;
 			echo balanceTags( "<style id='ig-pb-custom-{$post->ID}-css'>\n$css_custom\n</style>\n" );
 		}
 	}
+
 }

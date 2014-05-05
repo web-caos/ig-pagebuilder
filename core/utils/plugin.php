@@ -26,7 +26,9 @@ class IG_Pb_Utils_Plugin {
 		add_action( 'admin_init', array( &$this, 'do_deactivate' ) );
 	}
 
-	// Activate handle
+	/**
+     * Activate handle
+     */
 	function do_activate() {
 		// get current version of plugin
 		$latest_version = IG_Pb_Helper_Functions::get_plugin_info( IG_PB_FILE, 'Version' );
@@ -50,7 +52,12 @@ class IG_Pb_Utils_Plugin {
 		}
 	}
 
-	// Deactivate handle
+	/**
+     * Deactivate handle
+     *
+     * @global type $pagenow
+     * @global type $wpdb
+     */
 	function do_deactivate() {
 		global $pagenow;
 		if ( $pagenow == 'plugins.php' ) {
@@ -120,7 +127,8 @@ class IG_Pb_Utils_Plugin {
 					</center>
 					<?php
 					$message = ob_get_clean();
-					_default_wp_die_handler( $message );
+					// Change page title
+					_default_wp_die_handler( $message, __( 'WordPress &rsaquo; Confirmation', IGPBL ) );
 
 					exit;
 				} // Do deactivate after confirmation

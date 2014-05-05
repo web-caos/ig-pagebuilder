@@ -16,7 +16,7 @@ class IG_Pb_Helper_Html_Radio extends IG_Pb_Helper_Html {
 	 * @return string
 	 */
 	static function render( $element ) {
-		$element['class'] = isset( $element['class'] ) ? $element['class'] : 'radio inline';
+		$element['class'] = isset( $element['class'] ) ? $element['class'] : 'radio-inline';
 		$element['input_type'] = 'radio';
 		return IG_Pb_Helper_Shortcode::render_parameter( 'checkbox', $element );
 	}

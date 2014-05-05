@@ -35,9 +35,9 @@ class IG_Pb_Helper_Html_Dimension extends IG_Pb_Helper_Html {
 			$_width = array(
 				'id' => $element['id'] . '_width',
 				'type' => 'text_append',
-				'type_input' => 'number',
-				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'input_type' => 'number',
+				'class' => 'jsn-input-number input-mini input-sm',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['width_std'],
 				'append_before' => 'W',
 				'validate' => 'number',
@@ -51,7 +51,7 @@ class IG_Pb_Helper_Html_Dimension extends IG_Pb_Helper_Html {
 				$_w_unit = array(
 					'id' => $element['id'] . '_width_unit',
 					'type' => 'select',
-					'class' => 'input-mini combo-item',
+					'class' => 'input-mini input-sm',
 					'bound' => '0',
 				);
 
@@ -78,9 +78,9 @@ class IG_Pb_Helper_Html_Dimension extends IG_Pb_Helper_Html {
 
 			$_height = array(
 				'id' => $element['id'] . '_height',
-				'type_input' => 'number',
-				'class' => 'jsn-input-number input-mini',
-				'parent_class' => 'combo-item',
+				'input_type' => 'number',
+				'class' => 'jsn-input-number input-mini input-sm',
+				'parent_class' => 'input-group-inline',
 				'std' => $element['height_std'],
 				'append_before' => 'H',
 				'validate' => 'number',
@@ -93,7 +93,7 @@ class IG_Pb_Helper_Html_Dimension extends IG_Pb_Helper_Html {
 				$_h_unit = array(
 					'id' => $element['id'] . '_height_unit',
 					'type' => 'select',
-					'class' => 'input-mini combo-item',
+					'class' => 'input-mini input-sm',
 					'bound' => '0',
 				);
 				$_h_unit = array_merge( $_h_unit, $element[$_idx_height_unit] );

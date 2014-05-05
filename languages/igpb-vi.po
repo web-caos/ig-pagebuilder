@@ -422,20 +422,20 @@ msgid "( no name )"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:513
-msgid "No Link"
+msgid "No Action"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:514
-msgid "URL"
+msgid "Go to URL"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:515
-msgid "Single Entry"
+msgid "Go to Single Entry"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:518
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:546
-msgid "Taxonomy Overview Page"
+msgid "Go to Taxonomy Overview Page"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:543
@@ -443,7 +443,7 @@ msgid "Single Entries"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:560
-msgid "Large Image"
+msgid "Show Large Image"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/type.php:791
@@ -519,11 +519,11 @@ msgid "Items"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/html/preview.php:18
-msgid "Hide preview"
+msgid "Hide Live Preview"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/html/preview.php:19
-msgid "Live preview"
+msgid "Show Live Preview"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/core/helper/html/table.php:67
@@ -1387,11 +1387,7 @@ msgid "Alt Text Description"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/image.php:66
-msgid "Link Type"
-msgstr ""
-
-#: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/image.php:71
-msgid "Link Type Description"
+msgid "On Click"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/image.php:75
@@ -1746,7 +1742,7 @@ msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/video.php:71
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/video.php:80
-msgid "Video link"
+msgid "Video Link"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/shortcodes/video.php:115
@@ -2058,7 +2054,7 @@ msgid "PageBuilder by"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/templates/select-elements.php:30
-msgid "Select Elements"
+msgid "Select Element"
 msgstr ""
 
 #: E:\BB-projects\works\WPR\itpagebuilder\wp-content\plugins\ig-pagebuilder/templates/select-elements.php:37

@@ -23,16 +23,21 @@ class IG_Pb_Helper_Html_Tiny_Mce extends IG_Pb_Helper_Html {
 		if ( $element['exclude_quote'] == '1' ) {
 			$element['std'] = str_replace( '<ig_quote>', '"', $element['std'] );
 		}
-		$output = "<textarea class='{$element['class']} jsn-input-xxlarge-fluid ig_pb_tiny_mce' id='{$element['id']}' rows='{$element['row']}' cols='{$element['col']}' name='{$element['id']}' DATA_INFO>{$element['std']}</textarea>";
+		$output = "<textarea class='{$element['class']} ig_pb_tiny_mce' id='{$element['id']}' rows='{$element['row']}' cols='{$element['col']}' name='{$element['id']}' DATA_INFO>{$element['std']}</textarea>";
 
-		add_filter( 'ig_pb_assets_register_modal', array( __CLASS__, 'this_assets_register_modal' ) );
-		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'this_assets_enqueue_modal' ) );
+		add_filter( 'ig_pb_assets_register_modal', array( __CLASS__, 'register_assets_register_modal' ) );
+		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'enqueue_assets_modal' ) );
 
 		return parent::final_element( $element, $output, $label, true );
 	}
 
-	// register custom assets
-	static function this_assets_register_modal( $assets ){
+	/**
+     * Register tinymce assets
+     *
+     * @param array $scripts
+     * @return array
+     */
+	static function register_assets_register_modal( $assets ){
 		$assets['ig-pb-wysiwyg-js'] = array(
 			'src' => IG_Pb_Helper_Functions::path( 'assets/3rd-party/jquery-jwysiwyg' ) . '/jquery.wysiwyg.js',
 			'ver' => '1.0.0',
@@ -74,8 +79,13 @@ class IG_Pb_Helper_Html_Tiny_Mce extends IG_Pb_Helper_Html {
 		return $assets;
 	}
 
-	// enqueue custom assets
-	static function this_assets_enqueue_modal( $scripts ){
+	/**
+     * Enqueue colorpikcer assets
+     *
+     * @param array $scripts
+     * @return array
+     */
+	static function enqueue_assets_modal( $scripts ){
 		$scripts = array_merge( $scripts, array( 'ig-pb-wysiwyg-js', 'ig-pb-wysiwyg-css', 'ig-pb-wysiwyg-0.9-js', 'ig-pb-wysiwyg-0.9-css', 'ig-pb-wysiwyg-colorpicker-js', 'ig-pb-wysiwyg-table-js', 'ig-pb-wysiwyg-cssWrap-js', 'ig-pb-wysiwyg-image-js', 'ig-pb-wysiwyg-link-js' ) );
 
 		return $scripts;

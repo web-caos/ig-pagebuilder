@@ -54,6 +54,10 @@ function ig_pb_add_placeholder( $string, $replace, $placeholder, $expression ){
  * Ex:	html.replace(/_IG_INDEX_/g, value) => ig_pb_remove_placeholder(html, 'index', value)
 */
 function ig_pb_remove_placeholder( $string, $placeholder, $value ){
+    if ( ! $string ) {
+        return '';
+    }
+    
 	if ( !( $placeholders[$placeholder] ) )
 		return $string;
     var regexp = new RegExp($placeholders[$placeholder], "g");

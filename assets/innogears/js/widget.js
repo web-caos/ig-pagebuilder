@@ -21,7 +21,7 @@
 
 	$.IG_Widget_PageBuilder = function () {
 		$('.ig_shortcode_widget').each(function () {
-			$(this).closest('.widget-content').find('#form-container').html('');
+			$(this).closest('.widget-content').find('.ig-pb-form-container').html('');
 			if ( $(this).attr('value') ) {
 				var shortcode_data = $(this).attr('value');
 				shortcode_data = shortcode_data.replace(/--quote--/g, '"');
@@ -47,7 +47,7 @@
 					html += '</div> ';
 				}
 
-				$(this).closest('.widget-content').find('#form-container').html(html);
+				$(this).closest('.widget-content').find('.ig-pb-form-container').html(html);
 			}
 		});
 	}
@@ -58,14 +58,14 @@
 			var selected = $(this).val();
 			if ( selected ) {
 				$(this).closest('.widget-content').find('#ig_widget_edit_btn').attr('data-shortcode', selected);
-				$(this).closest('.widget-content').find('#form-container').html('<input type="hidden" id="ig-select-media" value="" /><input type="hidden" id="ig-tinymce-change" value="0" />');
+				$(this).closest('.widget-content').find('.ig-pb-form-container').html('<input type="hidden" id="ig-select-media" value="" /><input type="hidden" id="ig-tinymce-change" value="0" />');
 			}
 		});
 		$('body').delegate('.ig_widget_select_elm', 'change', function (e) {
 			var selected = $(this).val();
 			if ( selected ) {
 				$(this).closest('.widget-content').find('#ig_widget_edit_btn').attr('data-shortcode', selected);
-				$(this).closest('.widget-content').find('#form-container').html('<input type="hidden" id="ig-select-media" value="" /><input type="hidden" id="ig-tinymce-change" value="0" />');
+				$(this).closest('.widget-content').find('.ig-pb-form-container').html('<input type="hidden" id="ig-select-media" value="" /><input type="hidden" id="ig-tinymce-change" value="0" />');
 			}
 			$(this).closest('.widget-content').find('.ig_shortcode_widget').attr('value', '');
 		});
@@ -79,9 +79,9 @@
 			$(this).closest('.widget-content').addClass('active_element');
 			$(this).closest('.widget-content').find('#ig-widget-loading').show();
 			$(this).closest('.widget-content').find('.icon-pencil').hide();
-			if ( $('.active_element #form-container .jsn-item').length ) {
-				$('.active_element #form-container .jsn-item').addClass('ig-selected-element');
-				var sc_html = $('.active_element #form-container').html();
+			if ( $('.active_element .ig-pb-form-container .jsn-item').length ) {
+				$('.active_element .ig-pb-form-container .jsn-item').addClass('ig-selected-element');
+				var sc_html = $('.active_element .ig-pb-form-container').html();
 				var $shortcode = $(this).attr('data-shortcode');
 	            var $type = $(this).parent().attr('data-type');
 				$.HandleElement.appendToHolder($shortcode, null, $type, sc_html, elm_title);
@@ -96,15 +96,15 @@
 		$('body').bind('on_update_shortcode_widget', function (e, shortcode_content) {
 			if ( shortcode_content ) {
 				if ( shortcode_content == 'is_cancel' ) {
-					$('.active_element #form-design-content #form-container').html('');
+					$('.active_element #form-design-content .ig-pb-form-container').html('');
 				} else {
-					$('.active_element #form-design-content #form-container').find("[data-sc-info^='shortcode_content']").text(shortcode_content);
+					$('.active_element #form-design-content .ig-pb-form-container').find("[data-sc-info^='shortcode_content']").text(shortcode_content);
 					var json_shortcode = shortcode_content;
 					json_shortcode = json_shortcode.replace(/"/g, '--quote--');
 					json_shortcode = json_shortcode.replace(/\[/g, '--open_square--');
 					json_shortcode = json_shortcode.replace(/\]/g, '--close_square--');
 					$('.active_element .ig_shortcode_widget').val(json_shortcode);
-					$('.active_element #form-design-content #form-container').html('');
+					$('.active_element #form-design-content .ig-pb-form-container').html('');
 				}
 				$('.jsn-icon-loading').hide();
 				$('.icon-pencil').show();

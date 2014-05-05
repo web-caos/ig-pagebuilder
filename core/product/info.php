@@ -23,21 +23,21 @@ class IG_Product_Info {
 	 *
 	 * @var  string
 	 */
-	protected static $product_info = 'http://customers.innogears.com/versioning/ig_plugins.php';
+	protected static $product_info = 'http://www.innogears.com/versioning/ig_plugins.php';
 
 	/**
 	 * Link to get product installation package.
 	 *
 	 * @var  string
 	 */
-	protected static $product_download = 'http://customers.innogears.com/index.php?option=com_lightcart&controller=remoteconnectauthentication&task=authenticate&tmpl=component';
+	protected static $product_download = 'http://www.innogears.com/index.php?option=com_lightcart&controller=remoteconnectauthentication&task=authenticate&tmpl=component';
 
 	/**
 	 * Link to check product upgrade availability.
 	 *
 	 * @var  string
 	 */
-	protected static $product_upgrade = 'http://customers.innogears.com/versioning/product_upgrade.php';
+	protected static $product_upgrade = 'http://www.innogears.com/versioning/product_upgrade.php';
 
 	/**
 	 * Retrieved product information.

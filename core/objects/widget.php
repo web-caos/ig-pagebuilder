@@ -81,7 +81,7 @@ if ( ! class_exists( 'IG_Pb_Objects_Widget' ) ) {
 			if ( $title ) {
 				echo balanceTags( $before_title . $title . $after_title );
 			}
-			echo '<div class="jsn-bootstrap">';
+			echo '<div class="jsn-bootstrap3">';
 			echo balanceTags( do_shortcode( $shortcode ) );
 			echo '</div>';
 			echo balanceTags( $after_widget );
@@ -132,7 +132,7 @@ if ( ! class_exists( 'IG_Pb_Objects_Widget' ) ) {
 				}
 			}
 			?>
-			<div class="jsn-bootstrap">
+			<div class="jsn-bootstrap3">
 
 				<div class="ig-widget-setting">
 			<?php
@@ -142,7 +142,7 @@ if ( ! class_exists( 'IG_Pb_Objects_Widget' ) ) {
 			}
 			?>
 					<label for="<?php echo esc_attr( $this->get_field_id( 'ig_element' ) ); ?>"><?php _e( 'Element', IGPBL ) ?></label>
-					<div class="control-group combo-group ig-widget-box">
+					<div class="form-group control-group clearfix combo-group ig-widget-box">
 						<div class="controls">
 							<div class="combo-item">
 								<select class="ig_widget_select_elm" id="<?php echo esc_attr( $this->get_field_id( 'ig_element' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ig_element' ) ); ?>">
@@ -159,7 +159,7 @@ if ( ! class_exists( 'IG_Pb_Objects_Widget' ) ) {
 							</div>
 							<input class="ig_shortcode_widget" type="hidden" id="<?php echo esc_attr( $this->get_field_id( 'ig_widget_shortcode' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ig_widget_shortcode' ) ); ?>" value="<?php echo esc_attr( $ig_widget_shortcode ); ?>" />
 							<div class="jsn-section-content jsn-style-light hidden" id="form-design-content">
-								<div id="form-container" class="jsn-layout">
+								<div class="ig-pb-form-container jsn-layout">
 									<input type="hidden" id="ig-select-media" value="" />
 									<input type="hidden" id="ig-tinymce-change" value="0" />
 								</div>

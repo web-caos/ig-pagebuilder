@@ -22,13 +22,18 @@ class IG_Pb_Helper_Html_Icons extends IG_Pb_Helper_Html {
 			<input type='hidden' value='{$element['std']}' id='{$element['id']}' name='{$element['id']}'  DATA_INFO />
 		</div>";
 
-		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'this_assets_enqueue_modal' ) );
+		add_filter( 'ig_pb_assets_enqueue_modal', array( __CLASS__, 'enqueue_assets_modal' ) );
 
 		return parent::final_element( $element, $output, $label );
 	}
 
-	// enqueue custom assets
-	static function this_assets_enqueue_modal( $scripts ){
+	/**
+     * Enqueue icon selector assets
+     *
+     * @param array $scripts
+     * @return array
+     */
+	static function enqueue_assets_modal( $scripts ){
 		$scripts = array_merge( $scripts, array( 'ig-pb-joomlashine-iconselector-js', ) );
 
 		return $scripts;

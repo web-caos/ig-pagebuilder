@@ -9,7 +9,7 @@
  * Websites: http://www.innogears.com
  */
 ?>
-<ul class="ig-form-field-post-type" id="<?php $this->get( 'id' ); ?>">
+<ul class="<?php if ( ! @empty( $this->attributes['class'] ) ) echo esc_attr( $this->attributes['class'] ) . ' '; ?>ig-form-field-post-type" id="<?php $this->get( 'id' ); ?>">
 <?php
 // Backup original attributes
 $original_attrs = $this->attributes;
@@ -22,11 +22,13 @@ $this->attributes['name']  = "{$this->name}[{$content_type}]";
 $this->attributes['value'] = isset( $this->value[ $content_type ] ) ? $this->value[ $content_type ] : 0;
 ?>
 	<li id="<?php esc_attr_e( $content_type ); ?>" class="item">
-		<label class="checkbox">
-			<input type="checkbox" onclick="jQuery(this).next().val(this.checked ? 1 : 0);" <?php if ( $this->attributes['value'] ) echo ' checked="checked"'; ?> />
-			<input <?php $this->html_attributes( array( 'class', 'id', 'placeholder' ) ); ?> />
-			<?php esc_html_e( $label ); ?>
-		</label>
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" onclick="jQuery(this).next().val(this.checked ? 1 : 0);" <?php if ( $this->attributes['value'] ) echo ' checked="checked"'; ?> />
+				<input <?php $this->html_attributes( array( 'class', 'id', 'placeholder' ) ); ?> />
+				<?php esc_html_e( $label ); ?>
+			</label>
+		</div>
 	</li>
 <?php
 // Restore original attributes

@@ -25,8 +25,8 @@
                 return $("<div/>", {"class":"jsn-iconselector"}).append(
                     $("<div/>", {"class":"jsn-fieldset-filter"}).append(
                         $("<fieldset/>").append(
-                            $("<div/>", {"class":"pull-right jsn-quick-search"}).append(
-                                $("<input/>", {"class":"input search-query", "type":"text","id":"jsn-quicksearch-icons", "placeholder":"Search..."}).delayKeyup(function (el) {
+                            $("<div/>", {"class":"jsn-quick-search"}).append(
+                                $("<input/>", {"class":"input input-sm search-query form-control", "type":"text","id":"jsn-quicksearch-icons", "placeholder":"Search..."}).delayKeyup(function (el) {
                                     if ($(el).val() != oldIconFilter) {
                                         oldIconFilter = $(el).val();
                                         self.filterResults($(el).val(), resultsFilter);

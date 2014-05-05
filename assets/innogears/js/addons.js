@@ -86,53 +86,29 @@
 				return self.request('authenticate', identification, authentication, action);
 			}
 
-			// Open modal for customer login
-			self.authentication.dialog({
-				modal: true,
-				autoOpen: true,
-				draggable: false,
-				resizable: false,
-				dialogClass: 'jsn-master',
-				width: 635,
-				height: 335,
-				buttons: [
-					{
-						text: this.lang.INSTALL,
-						click: function() {
-							// Make sure username and password are not empty
-							if (self.username.val() != '' && self.password.val() != '') {
-								// Request server to authenticate customer account
-								self.request('authenticate', identification, authentication, action);
-							}
-						}
-					},
-					{
-						text: this.lang.CANCEL,
-						click: function() {
-							// Close authentication modal
-							self.authentication.dialog('close');
-						}
-					}
-				],
-				open: function() {
+			// Setup modal for customer login
+			if (!self.modal_initialized) {
+				self.authentication.modal({
+					show: false,
+				}).on('show.bs.modal', function() {
 					// Get `Install` button
-					var button = $(this).next().find('button:first-child').addClass('disabled').attr('disabled', 'disabled');
-
+					var button = $(this).find('.btn-primary').addClass('disabled').attr('disabled', 'disabled');
+	
 					// Clear previous data
-					self.authentication.find('.alert-error').hide().children('.message').html('');
-					self.authentication.find('#remember').removeAttr('checked');
+					$(this).find('.alert').addClass('hidden').children('.message').html('');
+					$(this).find('#remember').removeAttr('checked');
 					self.username.val('');
 					self.password.val('');
-
+	
 					// Track input fields
-					self.authentication.find('input[type!="checkbox"]').unbind('keyup').bind('keyup', function(event) {
+					$(this).find('input[type!="checkbox"]').unbind('keyup').bind('keyup', function(event) {
 						// Prevent default event handler
 						event.preventDefault();
-
+	
 						// Verify that username and password are not empty
 						if (self.username.val() != '' && self.password.val() != '') {
 							button.removeClass('disabled').removeAttr('disabled');
-
+	
 							// Check whether to submit form
 							if (event.keyCode == 13) {
 								button.trigger('click');
@@ -141,11 +117,26 @@
 							button.addClass('disabled').attr('disabled', 'disabled');
 						}
 					});
-				},
-				close: function() {
-					self.authentication.dialog('destroy');
-				}
-			});
+	
+					// Setup buttons
+					$(this).find('.btn').unbind('click').bind('click', function() {
+						if ($(this).hasClass('btn-primary')) {
+							// Make sure username and password are not empty
+							if (self.username.val() != '' && self.password.val() != '') {
+								// Request server to authenticate customer account
+								self.request('authenticate', identification, authentication, action);
+							}
+						} else {
+							// Close authentication modal
+							self.authentication.modal('hide');
+						}
+					});
+				});
+
+				self.modal_initialized = true;
+			}
+			// Show modal for customer login
+			self.authentication.modal('show');
 		},
 
 		request: function(action, identification, authentication, secondary_action) {
@@ -160,7 +151,7 @@
 
 			// Show processing status
 			if (action == 'authenticate' && !self.params.has_saved_account) {
-				self.authentication.next().find('button').eq(0).addClass('ig-loading disabled').attr('disabled', 'disabled').html(self.lang.AUTHENTICATING);
+				self.authentication.find('.btn-primary').addClass('ig-loading disabled').attr('disabled', 'disabled').html(self.lang.AUTHENTICATING);
 			} else {
 				// Toggle status
 				switch (action) {
@@ -188,7 +179,7 @@
 			$.ajax({
 				url: self.params.base_url + '&do=' + action + '&core=' + self.params.core_plugin + '&addon=' + identification + '&authentication=' + authentication,
 				type: (authentication && !self.params.has_saved_account) ? 'POST' : 'GET',
-				data: (authentication && !self.params.has_saved_account) ? self.authentication.children('form').serialize() : '',
+				data: (authentication && !self.params.has_saved_account) ? self.authentication.find('form').serialize() : '',
 			}).done(function(data) {
 				// Get add-on name
 				var addon_name = addon.closest('.caption').children('h3').html();
@@ -205,7 +196,7 @@
 					if (action == 'authenticate') {
 						// Close authentication modal if necessary
 						if (!self.params.has_saved_account) {
-							self.authentication.dialog('close');
+							self.authentication.modal('hide');
 
 							if (self.authentication.find('#remember').attr('checked')) {
 								// We have customer account in server-side now
@@ -293,11 +284,11 @@
 
 						// Show error message in authentication modal
 						if (data.message) {
-							self.authentication.find('.alert-error').show().children('.message').html(data.message);
+							self.authentication.find('.alert').removeClass('hidden').children('.message').html(data.message);
 						}
 
 						// Show authentication buttons
-						self.authentication.next().find('button').eq(0).removeClass('ig-loading').html(self.lang.INSTALL);
+						self.authentication.find('.btn-primary').removeClass('ig-loading').html(self.lang.INSTALL);
 					} else {
 						// Disable button because add-on cannot be installed
 						addon.addClass('disabled').attr('disabled', 'disabled');
@@ -322,7 +313,7 @@
 						}
 
 						// Append `Incompatible` sticker
-						addon.closest('li').children('img').after('<span class="label label-important">' + self.lang.INCOMPATIBLE + '</span>');
+						addon.closest('li').children('img').after('<span class="label label-danger">' + self.lang.INCOMPATIBLE + '</span>');
 
 						// Show error message
 						alert(data.message.replace('%s', addon_name));

@@ -9,9 +9,9 @@
  * Websites: http://www.innogears.com
  * Technical Support:  Feedback - http://www.innogears.com
  */
-if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
+if ( ! class_exists( 'IG_Item_Buttonbar' ) ) {
 
-	class IG_Item_ButtonBar extends IG_Pb_Shortcode_Child {
+	class IG_Item_Buttonbar extends IG_Pb_Shortcode_Child {
 
 		public function __construct() {
 			parent::__construct();
@@ -20,7 +20,7 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 		public function element_config() {
 			$this->config['shortcode'] = strtolower( __CLASS__ );
 			$this->config['exception'] = array(
-				'require_js'       => array( 'ig-linktype.js' ),
+				'admin_assets'     => array( 'ig-linktype.js' ),
 				'data-modal-title' => __( 'Button Bar Item', IGPBL )
 			);
 		}
@@ -32,15 +32,15 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 						'name'    => __( 'Text', IGPBL ),
 						'id'      => 'button_text',
 						'type'    => 'text_field',
-						'class'   => 'jsn-input-xxlarge-fluid',
 						'std'     => __( IG_Pb_Utils_Placeholder::add_placeholder( 'ButtonBar Item %s', 'index' ), IGPBL ),
 						'role'    => 'title',
 						'tooltip' => __( 'Set the text on the button', IGPBL )
 					),
 					array(
-						'name'       => __( 'Link Type', IGPBL ),
+						'name'       => __( 'On Click', IGPBL ),
 						'id'         => 'link_type',
 						'type'       => 'select',
+						'class'      => 'input-sm',
 						'std'        => 'url',
 						'options'    => IG_Pb_Helper_Type::get_link_types(),
 						'has_depend' => '1',
@@ -50,7 +50,7 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 						'name'       => __( 'URL', IGPBL ),
 						'id'         => 'button_type_url',
 						'type'       => 'text_field',
-						'class'      => 'jsn-input-xxlarge-fluid',
+						'class'      => 'input-sm',
 						'std'        => 'http://',
 						'dependency' => array( 'link_type', '=', 'url' ),
                         'tooltip' => __( 'Set url of button', IGPBL ),
@@ -65,7 +65,6 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 							array(
 								'type'         => 'items_list',
 								'options_type' => 'select',
-								'class'        => 'select2-select',
 								'ul_wrap'      => false,
 							 )
 						),
@@ -75,6 +74,7 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 						'name'       => __( 'Open in', IGPBL ),
 						'id'         => 'open_in',
 						'type'       => 'select',
+						'class'      => 'input-sm',
 						'std'        => IG_Pb_Helper_Type::get_first_option( IG_Pb_Helper_Type::get_open_in_options() ),
 						'options'    => IG_Pb_Helper_Type::get_open_in_options(),
 						'dependency' => array( 'link_type', '!=', 'no_link' ),
@@ -93,6 +93,7 @@ if ( ! class_exists( 'IG_Item_ButtonBar' ) ) {
 						'name'    => __( 'Size', IGPBL ),
 						'id'      => 'button_size',
 						'type'    => 'select',
+						'class'   => 'input-sm',
 						'std'     => IG_Pb_Helper_Type::get_first_option( IG_Pb_Helper_Type::get_button_size() ),
 						'options' => IG_Pb_Helper_Type::get_button_size(),
                         'tooltip' => __( 'Set the size of the button', IGPBL ),

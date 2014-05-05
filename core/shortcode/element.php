@@ -44,35 +44,75 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 		// enqueue custom assets at footer of frontend/backend
 		add_action( "{$prefix}_footer", array( &$this, 'custom_assets_frontend' ) );
 
+		// Register required assets
+		add_filter( 'ig-edit-element-required-assets', array( &$this, 'required_assets' ) );
 	}
 
-	// custom assets for frontend
+	/**
+	 * Define required assets for shortcode settings form.
+	 *
+	 * @param   array  $assets  Current required assets.
+	 *
+	 * @return  array
+	 */
+	public function required_assets( $assets ) {
+		if ( ! isset( $_GET['ig_shortcode_preview'] ) || ! $_GET['ig_shortcode_preview'] ) {
+			// Register admin assets if required
+			if ( @is_array( $this->config['exception'] ) && isset( $this->config['exception']['admin_assets'] ) ) {
+				$assets[] = $this->config['exception']['admin_assets'];
+			}
+		} else {
+			// Register front-end assets if required
+			if ( @is_array( $this->config['exception'] ) && isset( $this->config['exception']['frontend_assets'] ) ) {
+				$assets[] = $this->config['exception']['frontend_assets'];
+			}
+		}
+
+		return $assets;
+	}
+
+	/**
+     * Custom assets for frontend
+     */
 	public function custom_assets_frontend() {
 		// enqueue custom assets here
 	}
 
-	// enqueue scripts for frontend
+	/**
+     * Enqueue scripts for frontend
+     */
 	public function enqueue_assets_frontend() {
-		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_frontend_js', '_frontend' );
+		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'frontend_assets', '_frontend' );
 	}
 
-	// enqueue scripts for modal setting iframe
+	/**
+     * Enqueue scripts for modal setting iframe
+     *
+     * @param type $hook
+     */
 	public function enqueue_assets_modal( $hook ) {
-		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'require_js', '' );
+		IG_Pb_Helper_Functions::shortcode_enqueue_assets( $this, 'admin_assets', '' );
 	}
 
-	// define configuration information of shortcode
+	/**
+     * Define configuration information of shortcode
+     */
 	public function element_config() {
 
 	}
 
-	// define setting options of shortcode
+	/**
+     * Define setting options of shortcode
+     */
 	public function element_items() {
 
 	}
 
-	// add more options to all elements
+	/**
+     * Add more options to all elements
+     */
 	public function element_items_extra() {
+		$shotcode_name = $this->config['shortcode'];
 
 		$disable_el = array(
 			'name' => __( 'Disable', IGPBL ),
@@ -80,19 +120,42 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 			'type' => 'radio',
 			'std' => 'no',
 			'options' => array( 'yes' => __( 'Yes', IGPBL ), 'no' => __( 'No', IGPBL ) ),
-			'wrap_class' => 'control-group hidden',
+			'wrap_class' => 'form-group control-group hidden clearfix',
 		);
-		$css_suffix = array(
-			'name'    => __( 'Css Class suffix', IGPBL ),
-			'id'      => 'css_suffix',
-			'type'    => 'text_field',
-			'std'     => __( '', IGPBL ),
-			'tooltip' => __( 'Add custom css class for the wrapper div of this element', IGPBL )
+
+		// if not child element
+		if( strpos( $shotcode_name, 'item_' ) === false ) {
+			$css_suffix = array(
+				'name'    => __( 'CSS Class', IGPBL ),
+				'id'      => 'css_suffix',
+				'type'    => 'text_field',
+				'std'     => __( '', IGPBL ),
+				'tooltip' => __( 'Add custom css class for the wrapper div of this element', IGPBL )
+			);
+			$id_wrapper = array(
+				'name'    => __( 'ID', IGPBL ),
+				'id'      => 'id_wrapper',
+				'type'    => 'text_field',
+				'std'     => __( '', IGPBL ),
+				'tooltip' => __( 'Add custom id for the wrapper div of this element', IGPBL ),
+			);
+		}
+
+		// Copy style from other element.
+		$style_copy = array(
+			'name'    => __( 'Copy Style from...', IGPBL ),
+			'id'      => 'copy_style_from',
+			'type'    => 'select',
+			'options' => array( '0' => __( 'Select element', IGPBL ) ),
+			'std'     => __( '0', IGPBL ),
+			'tooltip' => __( 'Copy Styling prameters from other same type element', IGPBL ),
 		);
+
 		if ( isset ( $this->items['styling'] ) ) {
 			$this->items['styling'] = array_merge(
 				$this->items['styling'], array(
 					$css_suffix,
+					$id_wrapper,
 					$disable_el,
 					// always at the end of array
 					array(
@@ -101,18 +164,21 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 						'id'			=> 'div_margin',
 						'type'			=> 'margin',
 						'extended_ids'	=> array( 'div_margin_top', 'div_margin_bottom' ),
-						'div_margin_top'	=> array( 'std' => '' ),
-						'div_margin_bottom'	=> array( 'std' => '' ),
+						'div_margin_top'	=> array( 'std' => '10' ),
+						'div_margin_bottom'	=> array( 'std' => '10' ),
 						'margin_elements'	=> 't, b',
 						'tooltip' 			=> __( 'Set margin size', 	IGPBL )
 					),
 				)
 			);
+
+			array_unshift( $this->items['styling'], $style_copy );
 		} else {
 			if ( isset ( $this->items['Notab'] ) ) {
 				$this->items['Notab'] = array_merge(
 					$this->items['Notab'], array(
 						$css_suffix,
+						$id_wrapper,
 						$disable_el,
 
 					)
@@ -124,13 +190,13 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 	/**
 	 * DEFINE html structure of shortcode in Page Builder area
 	 *
-	 * @param type $content
-	 * @param type $shortcode_data: string stores params (which is modified default value) of shortcode
-	 * @param type $el_title: Element Title used to identifying elements in IG PageBuilder
+	 * @param string $content
+	 * @param string $shortcode_data: string stores params (which is modified default value) of shortcode
+	 * @param string $el_title: Element Title used to identifying elements in IG PageBuilder
 	 * Ex:  param-tag=h6&param-text=Your+heading&param-font=custom&param-font-family=arial
-	 * @return type
+	 * @return string
 	 */
-	public function element_in_pgbldr( $content = '', $shortcode_data = '', $el_title = '' ) {
+	public function element_in_pgbldr( $content = '', $shortcode_data = '', $el_title = '', $index = '' ) {
 		$shortcode		  = $this->config['shortcode'];
 		$is_sub_element   = ( isset( $this->config['sub_element'] ) ) ? true : false;
 		$parent_shortcode = ( $is_sub_element ) ? str_replace( 'ig_item_', '', $shortcode ) : $shortcode;
@@ -179,6 +245,11 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 		if ( empty($shortcode_data) )
 			$shortcode_data = $this->config['shortcode_structure'];
 
+		// Process index for subitem element
+		if ( ! empty( $index ) ) {
+			$shortcode_data = str_replace( '_IG_INDEX_' , $index, $shortcode_data );
+		}
+
 		$shortcode_data  = stripslashes( $shortcode_data );
 		$element_wrapper = ! empty( $exception['item_wrapper'] ) ? $exception['item_wrapper'] : ( $is_sub_element ? 'li' : 'div' );
 		$content_class   = ( $is_sub_element ) ? 'jsn-item-content' : 'ig-pb-element';
@@ -212,8 +283,8 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 	/**
 	 * DEFINE shortcode content
 	 *
-	 * @param type $atts
-	 * @param type $content
+	 * @param array $atts
+	 * @param string $content
 	 */
 	public function element_shortcode_full( $atts = null, $content = null ) {
 
@@ -222,8 +293,8 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 	/**
 	 * return shortcode content: if shortcode is disable, return empty
 	 *
-	 * @param type $atts
-	 * @param type $content
+	 * @param array $atts
+	 * @param string $content
 	 */
 	public function element_shortcode( $atts = null, $content = null ) {
 		$arr_params = ( shortcode_atts( $this->config['params'], $atts ) );
@@ -244,10 +315,10 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 	/**
 	 * Wrap output html of a shortcode
 	 *
-	 * @param type $arr_params
-	 * @param type $html_element
-	 * @param type $extra_class
-	 * @return type
+	 * @param array $arr_params
+	 * @param string $html_element
+	 * @param string $extra_class
+	 * @return string
 	 */
 	public function element_wrapper( $html_element, $arr_params, $extra_class = '', $custom_style = '' ) {
 		$shortcode_name = IG_Pb_Helper_Shortcode::shortcode_name( $this->config['shortcode'] );
@@ -263,39 +334,68 @@ class IG_Pb_Shortcode_Element extends IG_Pb_Shortcode_Common {
 		if ( ! empty( $style ) || ! empty( $custom_style ) ){
 			$style = "style='$style $custom_style'";
 		}
-		$class  = "ig-element-container ig-element-$shortcode_name";
+
+		$class        = "ig-element-container ig-element-$shortcode_name";
 		$extra_class .= ! empty ( $arr_params['css_suffix'] ) ? ' ' . esc_attr( $arr_params['css_suffix'] ) : '';
-		$class .= ! empty ( $extra_class ) ? ' ' . ltrim( $extra_class, ' ' ) : '';
-		return "<div class='$class' $style>" . $html_element . '</div>';
+		$class       .= ! empty ( $extra_class ) ? ' ' . ltrim( $extra_class, ' ' ) : '';
+		$extra_id     = ! empty ( $arr_params['id_wrapper'] ) ? ' ' . esc_attr( $arr_params['id_wrapper'] ) : '';
+		$extra_id     = ! empty ( $extra_id ) ? "id='" . ltrim( $extra_id, ' ' ) . "'" : '';
+		return "<div $extra_id class='$class' $style>" . $html_element . '</div>';
 	}
 
 	/**
-	 * DEFINE html structure of shortcode in "Select Elements" Modal
+	 * Define html structure of shortcode in "Select Elements" Modal
 	 *
-	 * @param type $sort
-	 * @return type
+	 * @param string $data_sort The string relates to Provider name to sort
+	 * @return string
 	 */
-	public function element_button( $sort ) {
-		$type   = 'element';
-		$extra_ = ( $sort > 0 ) ? "data-value='" . strtolower( $this->config['name'] ) . "' data-type = '" . ( $type ) . "'" : '';
-		return self::el_button( $extra_, $this->config );
+	public function element_button( $data_sort = '' ) {
+		// Prepare variables
+		$type  = 'element';
+		$data_value = strtolower( $this->config['name'] );
+
+		$extra = sprintf( 'data-value="%s" data-type="%s" data-sort="%s"', esc_attr( $data_value ), esc_attr( $type ), esc_attr( $data_sort ) );
+
+		return self::el_button( $extra, $this->config );
 	}
 
-	public static function el_button( $extra_, $config ) {
-		$icon = '';//isset($config['icon']) ? '<i class="jsn-icon16 icon-formfields jsn-' . $config['icon'] . '"></i>' : '';
-		return '<li class="jsn-item" ' . $extra_ . '>
-					<button data-shortcode="' . $config['shortcode'] . '" class="shortcode-item btn">
+	/**
+     * HTML output for a shortcode in Add Element popover
+     *
+     * @param string $extra
+     * @param array $config
+     * @return string
+     */
+	public static function el_button( $extra, $config ) {
+		// Generate icon if necessary
+		$icon = '';
+
+		if ( isset( $config['icon'] ) ) {
+			$icon = '<i class="jsn-icon16 icon-formfields jsn-' . $config['icon'] . '"></i> ';
+		}
+
+		// Generate data-iframe attribute if needed
+		$attr = '';
+
+		if ( isset( $config['edit_using_ajax'] ) && $config['edit_using_ajax'] ) {
+			$attr = ' data-use-ajax="1"';
+		}
+
+		return '<li class="jsn-item"' . ( empty( $extra ) ? '' : ' ' . trim( $extra ) ) . '>
+					<button data-shortcode="' . $config['shortcode'] . '" class="shortcode-item btn btn-default"' . $attr . '>
 						' . $icon . $config['name'] . '
 					</button>
 				</li>';
 	}
 
-	// get params & structure of shortcode
+	/**
+     * Get params & structure of shortcode
+     */
 	public function shortcode_data() {
 		$params = IG_Pb_Helper_Shortcode::generate_shortcode_params( $this->items, null, null, false, true );
 		// add Margin parameter for Not child shortcode
 		if ( strpos( $this->config['shortcode'], '_item' ) === false ) {
-			$this->config['params'] = array_merge( array( 'div_margin_top' => '', 'div_margin_bottom' => '', 'disabled_el' => 'no', 'css_suffix' => '' ), $params );
+			$this->config['params'] = array_merge( array( 'div_margin_top' => '10', 'div_margin_bottom' => '10', 'disabled_el' => 'no', 'css_suffix' => '', 'id_wrapper' => '' ), $params );
 		}
 		else {
 			$this->config['params'] = $params;

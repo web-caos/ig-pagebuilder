@@ -10,7 +10,7 @@
  */
 
 // Define necessary attributes
-if ( ! isset( $this->attributes['class'] ) ) {
+if ( ! isset( $this->attributes['class'] ) || 'form-control' == $this->attributes['class'] ) {
 	$this->attributes['class'] = 'btn btn-primary';
 }
 

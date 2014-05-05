@@ -9,18 +9,20 @@
  * Websites: http://www.innogears.com
  */
 ?>
-<div class="wrap jsn-master">
+<div class="wrap jsn-bootstrap3">
 	<h2><?php _e( $plugin['Name'], IG_LIBRARY_TEXTDOMAIN ); ?> <?php _e( 'Add-ons', IG_LIBRARY_TEXTDOMAIN ); ?></h2>
 	<p>
 		<?php printf( __( 'Extend %s functionality with following add-ons', IG_LIBRARY_TEXTDOMAIN ), __( $plugin['Name'], IG_LIBRARY_TEXTDOMAIN ) ); ?>
 	</p>
-	<div class="jsn-bootstrap" id="ig-product-addons">
-		<ul id="<?php echo '' . $plugin['Identified_Name']; ?>-addons" class="thumbnails">
+	<div id="ig-product-addons">
+		<ul id="<?php echo '' . $plugin['Identified_Name']; ?>-addons" class="thumbnails clearfix">
 			<?php foreach ( $plugin['Addons'] as $identified_name => $details ) : ?>
-			<li class="thumbnail">
-				<img src="<?php echo esc_url( $details->thumbnail ); ?>" alt="<?php esc_attr_e( $details->name, IG_LIBRARY_TEXTDOMAIN ) ?>" />
+			<li class="thumbnail pull-left">
+				<a href="<?php echo esc_url( $details->url ); ?>" target="_blank">
+					<img src="<?php echo esc_url( $details->thumbnail ); ?>" alt="<?php esc_attr_e( $details->name, IG_LIBRARY_TEXTDOMAIN ) ?>" />
+				</a>
 				<?php if ( ! $details->compatible ) : ?>
-				<span class="label label-important"><?php _e( 'Incompatible', IG_LIBRARY_TEXTDOMAIN ); ?></span>
+				<span class="label label-danger"><?php _e( 'Incompatible', IG_LIBRARY_TEXTDOMAIN ); ?></span>
 				<?php elseif ( $details->installed ) : ?>
 				<span class="label label-success"><?php _e( 'Installed', IG_LIBRARY_TEXTDOMAIN ); ?></span>
 				<?php endif; ?>
@@ -43,7 +45,7 @@
 							</a>
 							<?php endif; ?>
 						</div>
-						<a class="btn pull-right" href="<?php echo esc_url( $details->url ); ?>" target="_blank">
+						<a class="btn btn-info pull-right" href="<?php echo esc_url( $details->url ); ?>" target="_blank">
 							<?php _e( 'More Info', IG_LIBRARY_TEXTDOMAIN ); ?>
 						</a>
 					</div>
@@ -53,35 +55,53 @@
 		</ul>
 	</div>
 </div>
-<div id="<?php echo '' . $plugin['Identified_Name']; ?>-authentication" title="<?php _e( 'InnoGears Customer Account', IG_LIBRARY_TEXTDOMAIN ); ?>" class="jsn-bootstrap ig-product-addons-authentication hidden">
-	<form name="IG_Addons_Authentication" method="POST" class="form-horizontal" autocomplete="off">
-		<div class="alert alert-block alert-error hidden">
-			<a title="<?php _e( 'Close', IG_LIBRARY_TEXTDOMAIN ); ?>" onclick="jQuery(this).parent().hide();" href="javascript:void(0);" class="jsn-close-message close">
-				×
-			</a>
-			<span class="message"></span>
-		</div>
-		<div class="control-group">
-			<label class="control-label" for="username"><?php _e( 'Username', IG_LIBRARY_TEXTDOMAIN ); ?>:</label>
-			<div class="controls">
-				<input type="text" value="" class="input-xlarge" id="username" name="username" />
+<div class="jsn-bootstrap3 ig-product-addons-authentication">
+	<div class="modal fade" id="<?php echo '' . $plugin['Identified_Name']; ?>-authentication" tabindex="-1" role="dialog" aria-labelledby="<?php echo '' . $plugin['Identified_Name']; ?>-authentication-modal-label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="<?php echo '' . $plugin['Identified_Name']; ?>-authentication-modal-label">
+						<?php _e( 'InnoGears Customer Account', IG_LIBRARY_TEXTDOMAIN ); ?>
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form name="IG_Addons_Authentication" method="POST" class="form-horizontal" autocomplete="off">
+						<div class="alert alert-danger hidden">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<span class="message"></span>
+						</div>
+						<div class="form-group clearfix">
+							<label class="col-sm-3 control-label" for="username"><?php _e( 'Username', IG_LIBRARY_TEXTDOMAIN ); ?>:</label>
+							<div class="col-sm-9">
+								<input type="text" value="" class="form-control" id="username" name="username" autocomplete="off" />
+							</div>
+						</div>
+						<div class="form-group clearfix">
+							<label class="col-sm-3 control-label" for="password"><?php _e( 'Password', IG_LIBRARY_TEXTDOMAIN ); ?>:</label>
+							<div class="col-sm-9">
+								<input type="password" value="" class="form-control" id="password" name="password" autocomplete="off" />
+							</div>
+						</div>
+						<div class="form-group clearfix">
+							<div class="col-sm-9 pull-right">
+								<div class="checkbox-inline">
+									<label>
+										<input type="checkbox" value="1" id="remember" name="remember" autocomplete="off" />
+										<?php _e( 'Remember Me', IG_LIBRARY_TEXTDOMAIN ); ?>
+									</label>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"><?php _e( 'Install', IG_LIBRARY_TEXTDOMAIN ); ?></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?php _e( 'Cancel', IG_LIBRARY_TEXTDOMAIN ); ?></button>
+				</div>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label" for="password"><?php _e( 'Password', IG_LIBRARY_TEXTDOMAIN ); ?>:</label>
-			<div class="controls">
-				<input type="password" value="" class="input-xlarge" id="password" name="password" />
-			</div>
-		</div>
-		<div class="control-group">
-			<div class="controls">
-				<label>
-					<input type="checkbox" value="1" id="remember" name="remember" />
-					<?php _e( 'Remember Me', IG_LIBRARY_TEXTDOMAIN ); ?>
-				</label>
-			</div>
-		</div>
-	</form>
+	</div>
 </div>
 <?php
 // Load inline script initialization

@@ -18,7 +18,7 @@ class IG_Pb_Helper_Html_Text_Field extends IG_Pb_Helper_Html {
 	static function render( $element ) {
 		$element = parent::get_extra_info( $element );
 		$label   = parent::get_label( $element );
-		$type    = ! empty( $element['input-type'] ) ? $element['input-type'] : 'text';
+		$type    = ! empty( $element['input_type'] ) ? $element['input_type'] : 'text';
 		$output  = "<input type='$type' class='{$element['class']}' value='{$element['std']}' id='{$element['id']}' name='{$element['id']}' DATA_INFO />";
 
 		return parent::final_element( $element, $output, $label );

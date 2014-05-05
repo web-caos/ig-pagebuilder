@@ -9,9 +9,9 @@
  * Websites: http://www.innogears.com
  * Technical Support:  Feedback - http://www.innogears.com
  */
-if ( ! class_exists( 'IG_Item_ProgressBar' ) ) {
+if ( ! class_exists( 'IG_Item_Progressbar' ) ) {
 
-	class IG_Item_ProgressBar extends IG_Pb_Shortcode_Child {
+	class IG_Item_Progressbar extends IG_Pb_Shortcode_Child {
 
 		public function __construct() {
 			parent::__construct();
@@ -32,7 +32,7 @@ if ( ! class_exists( 'IG_Item_ProgressBar' ) ) {
 						'name'    => __( 'Text', IGPBL ),
 						'id'      => 'pbar_text',
 						'type'    => 'text_field',
-						'class'   => 'jsn-input-xxlarge-fluid',
+						'class'   => 'input-sm',
 						'std'     => __( IG_Pb_Utils_Placeholder::add_placeholder( 'Progress bar %s', 'index' ), IGPBL ),
 						'role'    => 'title',
 						'tooltip' => __( 'Text', IGPBL )
@@ -41,7 +41,7 @@ if ( ! class_exists( 'IG_Item_ProgressBar' ) ) {
 						'name'         => __( 'Percentage', IGPBL ),
 						'id'           => 'pbar_percentage',
 						'type'         => 'text_append',
-						'type_input'   => 'number',
+						'input_type'   => 'number',
 						'class'        => 'input-mini',
 						'std'          => '25',
 						'append'       => '%',
@@ -62,6 +62,7 @@ if ( ! class_exists( 'IG_Item_ProgressBar' ) ) {
 						'name'    => __( 'Style', IGPBL ),
 						'id'      => 'pbar_item_style',
 						'type'    => 'select',
+						'class'   => 'input-sm',
 						'std'     => IG_Pb_Helper_Type::get_first_option( IG_Pb_Helper_Type::get_progress_bar_item_style() ),
 						'options' => IG_Pb_Helper_Type::get_progress_bar_item_style(),
 						'tooltip' => __( 'Style', IGPBL )

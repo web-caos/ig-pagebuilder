@@ -6,7 +6,7 @@ jQuery( function ( $ ) {
 	// move IG PageBuilder box to content of "Page Builder" tab
 	$( '#ig_page_builder' )
 	.insertAfter( '#ig_before_pagebuilder' )
-	.addClass( 'jsn-bootstrap' )
+	.addClass( 'jsn-bootstrap3' )
 	.removeClass('postbox')
 	.find( '.handlediv' ).remove()
 	.end()
@@ -46,7 +46,7 @@ jQuery( function ( $ ) {
         $('#preview-action').css('position', 'relative');
         // Add a overlay div of "Preview Changes" button
         $('<div />', {'id' : 'ig-preview-overlay'}).css({'position':'absolute', 'width' : '100%', 'height' : '24px'}).hide().appendTo($('#preview-action'));
-        $('#form-container').bind('ig-pagebuilder-layout-changed', function() {
+        $('.ig-pb-form-container').bind('ig-pagebuilder-layout-changed', function() {
             // Prevent click "Preview Changes" button
             $('#ig-preview-overlay').show();
             $('#post-preview').attr('disabled', true);
@@ -60,11 +60,14 @@ jQuery( function ( $ ) {
             function _update_content(callback) {
                 // if this change doesn't come from Classic Editor tab
                 if( ! $('#TB_window #ig-shortcodes').is(':visible') ) {
+
+                    // get current IG PageBuilder content
                     var tab_content = '';
-                    $("#form-container textarea[name^='shortcode_content']").each(function(){
+                    $(".ig-pb-form-container textarea[name^='shortcode_content']").each(function(){
                         tab_content += $(this).val();
                     });
 
+                    // update content of WP editor
                     if(tinymce.activeEditor)
                         tinymce.activeEditor.setContent(tab_content);
                     $("#ig_editor_tab1 #content").val(tab_content);

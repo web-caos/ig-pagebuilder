@@ -37,18 +37,27 @@
         actionIconbar:function(this_){
             this_.container.find(".element-action-edit").click(function (e) {
                 this_.openActionSettings(this_, $(this));
-                $.HandleSetting.select2_color();
-                if($('#shortcode_name').val() == 'ig_contentclips'){
+
+                // Remove old select2 in Popover before re-initialize
+                $('#modalAction').find('.select2-container').remove();
+
+                // Remove select2 drop mask
+                $('#select2-drop-mask').remove();
+
+                // Re-initialize select2
+                if($('.select2').length > 0 || $('.select2-select').length > 0){
+                    $.HandleSetting.select2();
+                }
+
+                // Fix font selector
+                if($('.jsn-fontFaceType').length > 0){
                     new $.IGSelectFonts();
+                }
+
+                // Fix color selector
+                if($('.color-selector').length > 0){
                     new $.IGColorPicker();
                 }
-                setTimeout(function(){
-                    $('#modalAction .combo-item').each(function(){
-                        if($(this).find('.select2-container').length == 2){
-                            $(this).find('.select2-container').first().remove();
-                        }
-                    });
-                }, 200);
 
                 e.stopPropagation();
             });
@@ -57,7 +66,9 @@
             this_.container.find(".jsn-item.ui-state-edit").removeClass("ui-state-edit");
             $(btnInput).parents(".jsn-item").addClass("ui-state-edit");
             $(".control-list-action").hide();
-            var dialog, value, el_title;
+            var dialog, value, el_title, options = {};
+            options.btnInput = btnInput ? btnInput : null;
+
             if(specific == null){
                 value = $(btnInput).parents(".jsn-item").find(":input").val();
             }
@@ -66,42 +77,23 @@
             }
             el_title = $(btnInput).parents(".jsn-item").find("label").text();
 
+            var dialog_html = '';
             if($("#control-action-"+value).length == 0){
-                var dialog_html = '';
                 $('body').find('[data-related-to="'+value+'"]').each(function(){
                     dialog_html += $("<div />").append($(this).clone()).html();
                     $(this).remove();
                 })
-                dialog = $("<div/>", {
-                    'class':'control-list-action jsn-bootstrap',
-                    'id':"control-action-"+value,
-                    'style' : 'position: absolute;width:300px;'
-                }).append(
-                    $("<div/>", {
-                        "class":"popover left"
-                    }).css("display", "block").append($("<div/>", {
-                        "class":"arrow"
-                    })).append(
-                        $("<h3/>", {
-                            "class":"popover-title",
-                            text:el_title + ' ' + Ig_Translate.settings
-                        })
-                    ).append(
-                        $("<div/>", {
-                            "class":"popover-content"
-                        }).append(
-                            dialog_html
-                            )
-                    )
-                )
-                $(dialog).find('.hidden').removeClass('hidden');
-                $(dialog).hide();
-                $(dialog).appendTo('#modalAction');
+                dialog = dialog_html;
+                options.el_title = el_title;
+                options.value = value;
             }
             else{
-                dialog = $("#control-action-"+value);
+                dialog_html = $("#control-action-"+value);
             }
-            dialog.fadeIn(500);
+
+            // show dialog
+            dialog = this_.showPopover(dialog_html, options);
+
             // update HTML DOM
             $( '.control-list-action' ).delegate( '[id^="param"]', 'change', function () {
                 $(this).attr('value',$(this).val());
@@ -115,17 +107,7 @@
             if(callback)
                 callback(dialog);
 
-            var elmStyle = this_.getBoxStyle($(dialog).find(".popover")),
-            parentStyle = this_.getBoxStyle($(btnInput)),
-            position = {};
-            position.left = parentStyle.offset.left - elmStyle.outerWidth - 11; // 11 is width of arrow of popover left
-            position.top = parentStyle.offset.top - (elmStyle.outerHeight / 2) + (parentStyle.outerHeight / 2) - 12;
-
-            dialog.css(position).click(function (e) {
-                e.stopPropagation();
-            });
             $(document).click(function () {
-                dialog.hide();
                 this_.container.find(".jsn-item.ui-state-edit").removeClass("ui-state-edit");
             });
 
@@ -155,6 +137,80 @@
             };
 
             return style;
+        },
+
+        /**
+         * Show popover
+         */
+        showPopover:function(dialog_html, options, callback) {
+            var this_ = this;
+            var dialog;
+            if (typeof dialog_html == 'object') {
+                dialog = dialog_html;
+            } else {
+                dialog = $("<div/>", {
+                    'class':'control-list-action jsn-bootstrap3',
+                    'id':"control-action-" + options.value,
+                    'style' : 'position: absolute; width: 300px;'
+                }).append(
+                    $("<div/>", {
+                        "class":"popover left"
+                    }).css("display", "block").append($("<div/>", {
+                        "class":"arrow"
+                    })).append(
+                        $("<h3/>", {
+                            "class":"popover-title",
+                            text: options.el_title + ' ' + Ig_Translate.settings
+                        })
+                    ).append(
+                        $("<div/>", {
+                            "class":"popover-content"
+                        }).append(
+                            dialog_html
+                            )
+                    )
+                );
+            }
+            if (typeof dialog_html != 'object') {
+                if(options.show_hidden == null || options.show_hidden){
+                    dialog.find('.hidden').removeClass('hidden');
+                }
+
+                dialog.hide();
+                dialog.appendTo('#modalAction');
+            }
+
+            dialog.fadeIn(500);
+
+            // Get position of popover
+            var elmStyle = this_.getBoxStyle(dialog.find(".popover")),
+            parentStyle = this_.getBoxStyle($(options.btnInput)),
+            position = {};
+            position.left = parentStyle.offset.left - elmStyle.outerWidth - 11; // 11 is width of arrow of popover left
+            position.top = parentStyle.offset.top - (elmStyle.outerHeight / 2) + (parentStyle.outerHeight / 2) - 12 + ( options.offset ? options.offset : 0);
+
+            // if this element doesn't use Iframe
+            var dialog_wrapper = $('.ui-dialog').last();
+            if(dialog_wrapper.length){
+                var dialog_wrapper_pos = this_.getBoxStyle(dialog_wrapper);
+                position.left -= dialog_wrapper_pos.offset.left;
+                position.top -= dialog_wrapper_pos.offset.top + 40;
+                $('.jsn-bootstrap3 .popover.left > .arrow').css('left', 'auto');
+            }
+
+            // Update position for popover
+            dialog.css(position);
+
+            dialog.click(function (e) {
+                e.stopPropagation();
+            });
+
+            $(document).click(function () {
+                dialog.hide();
+                if(callback){
+                    callback();
+                }
+            });
         }
     }
 
